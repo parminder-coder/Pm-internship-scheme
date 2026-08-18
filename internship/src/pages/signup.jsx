@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+    User,
     Mail,
     Lock,
     Eye,
@@ -8,11 +9,10 @@ import {
     ArrowRight,
     ExternalLink
 } from "lucide-react";
-import "./login.css";
+import "./signup.css";
 
-export default function Login() {
+export default function Signup({ onNavigateToLogin }) {
     const [showPassword, setShowPassword] = useState(false);
-    // const [rememberMe, setRememberMe] = useState(false);
 
     const {
         register,
@@ -22,6 +22,7 @@ export default function Login() {
         mode: "onChange",
         reValidateMode: "onChange",
         defaultValues: {
+            name: "",
             email: "",
             password: "",
         },
@@ -29,17 +30,17 @@ export default function Login() {
 
     const onSubmit = async (data) => {
         // API route to be integrated
-        console.log("Login submitted:", data);
+        console.log("Signup submitted:", data);
         // Simulate brief network delay
         await new Promise((resolve) => setTimeout(resolve, 800));
     };
 
     return (
-        <div className="login-page-container">
-            {/* ----------------- LEFT SIDE: LOGIN FORM ----------------- */}
-            <div className="login-left-section">
+        <div className="signup-page-container">
+            {/* ----------------- LEFT SIDE: SIGNUP FORM ----------------- */}
+            <div className="signup-left-section">
                 {/* Top Branding / Logo */}
-                <div className="login-header">
+                <div className="signup-header">
                     <div className="brand-wrapper">
                         <div className="brand-logo-badge">
                             PM
@@ -61,12 +62,41 @@ export default function Login() {
                     {/* Header Title */}
                     <div className="form-header">
                         <h1 className="form-title">
-                            Sign In to Your Account
+                            Create Your Account
                         </h1>
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+                    <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
+                        {/* Name Input */}
+                        <div className="form-group">
+                            <label className="form-label">
+                                Full Name
+                            </label>
+                            <div className="input-icon-wrapper">
+                                <div className="input-icon-prefix">
+                                    <User size={16} />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Enter your full name"
+                                    {...register("name", {
+                                        required: "Full name is required",
+                                        minLength: {
+                                            value: 2,
+                                            message: "Name must be at least 2 characters",
+                                        },
+                                    })}
+                                    className={`form-input ${errors.name ? "input-error" : ""}`}
+                                />
+                            </div>
+                            {errors.name && (
+                                <p className="field-error-text">
+                                    <span>•</span> {errors.name.message}
+                                </p>
+                            )}
+                        </div>
+
                         {/* Email Input */}
                         <div className="form-group">
                             <label className="form-label">
@@ -98,14 +128,9 @@ export default function Login() {
 
                         {/* Password Input */}
                         <div className="form-group">
-                            <div className="form-label-row">
-                                <label className="form-label">
-                                    Password
-                                </label>
-                                <button type="button" className="forgot-password-link">
-                                    Forgot password?
-                                </button>
-                            </div>
+                            <label className="form-label">
+                                Password
+                            </label>
 
                             <div className="input-icon-wrapper">
                                 <div className="input-icon-prefix">
@@ -113,7 +138,7 @@ export default function Login() {
                                 </div>
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="Enter your password"
+                                    placeholder="Create a strong password"
                                     {...register("password", {
                                         required: "Password is required",
                                         minLength: {
@@ -139,54 +164,41 @@ export default function Login() {
                             )}
                         </div>
 
-                        {/* Remember Me Checkbox */}
-                        {/* <div className="form-options-row">
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="checkbox-input"
-                                />
-                                <span className="checkbox-text">
-                                    Keep me logged in for 30 days
-                                </span>
-                            </label>
-                        </div> */}
-
                         {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={isSubmitting}
                             className="submit-btn"
                         >
-                            <span>Sign In</span>
+                            <span>Sign Up</span>
                             <ArrowRight className="submit-btn-icon" />
                         </button>
                     </form>
 
-                    {/* Sign Up Redirect */}
+                    {/* Sign In Redirect */}
                     <p className="signup-prompt">
-                        Don't have an account?{" "}
-                        <button type="button" className="signup-link-btn">
-                            Register
+                        Already have an account?{" "}
+                        <button
+                            type="button"
+                            className="signup-link-btn"
+                            onClick={onNavigateToLogin}
+                        >
+                            Sign In
                         </button>
                     </p>
                 </div>
             </div>
 
             {/* ----------------- RIGHT SIDE: HERO & SCHEME HIGHLIGHTS ----------------- */}
-            <div className="login-right-section">
-
+            <div className="signup-right-section">
                 {/* Middle Welcome & Core Content */}
                 <div className="hero-content">
                     <h2 className="hero-title">
-                        Empowering India's Youth with Industry Excellence.
+                        Shape Your Future with India's Leading Enterprises.
                     </h2>
 
                     <p className="hero-description">
-                        Welcome back to the Prime Minister’s Internship Scheme. Connect with India's top 500
-                        enterprises for hands-on internships.
+                        Join the Prime Minister’s Internship Scheme today.<br/>  Gain real-world industry experience and professional mentorship.
                     </p>
                 </div>
 
