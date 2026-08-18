@@ -12,7 +12,7 @@ import "./login.css";
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
+    // const [rememberMe, setRememberMe] = useState(false);
 
     const {
         register,
@@ -140,7 +140,7 @@ export default function Login() {
                         </div>
 
                         {/* Remember Me Checkbox */}
-                        <div className="form-options-row">
+                        {/* <div className="form-options-row">
                             <label className="checkbox-label">
                                 <input
                                     type="checkbox"
@@ -152,7 +152,7 @@ export default function Login() {
                                     Keep me logged in for 30 days
                                 </span>
                             </label>
-                        </div>
+                        </div> */}
 
                         {/* Submit Button */}
                         <button
