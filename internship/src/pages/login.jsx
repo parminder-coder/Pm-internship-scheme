@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import "./login.css";
 
-export default function Login() {
+export default function Login({ onNavigateToSignup }) {
     const [showPassword, setShowPassword] = useState(false);
     // const [rememberMe, setRememberMe] = useState(false);
 
@@ -168,7 +168,11 @@ export default function Login() {
                     {/* Sign Up Redirect */}
                     <p className="signup-prompt">
                         Don't have an account?{" "}
-                        <button type="button" className="signup-link-btn">
+                        <button
+                            type="button"
+                            className="signup-link-btn"
+                            onClick={onNavigateToSignup}
+                        >
                             Register
                         </button>
                     </p>
