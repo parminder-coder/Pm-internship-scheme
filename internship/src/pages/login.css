@@ -327,7 +327,7 @@ html, body {
     width: 100%;
     height: 2.75rem;
     margin-top: 0.5rem;
-    background: linear-gradient(to right, #2563eb, #4f46e5);
+    background: #03045E;
     color: #ffffff;
     font-size: 0.875rem;
     font-weight: 600;
@@ -404,7 +404,7 @@ html, body {
     justify-content: space-between;
     overflow: hidden;
     isolation: isolate;
-    background: linear-gradient(135deg, #061838 0%, #0b2a63 50%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #03045e 50%, #003459 100%);
     padding: 2rem 1.5rem;
     color: #ffffff;
     min-height: 520px;

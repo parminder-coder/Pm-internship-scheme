@@ -160,7 +160,7 @@ export default function Login() {
                             disabled={isSubmitting}
                             className="submit-btn"
                         >
-                            <span>{isSubmitting ? "Authenticating..." : "Sign In"}</span>
+                            <span>Sign In</span>
                             <ArrowRight className="submit-btn-icon" />
                         </button>
                     </form>
@@ -177,10 +177,6 @@ export default function Login() {
 
             {/* ----------------- RIGHT SIDE: HERO & SCHEME HIGHLIGHTS ----------------- */}
             <div className="login-right-section">
-                {/* Background Ambient Glow Elements */}
-                <div className="bg-ambient-orb-top" />
-                <div className="bg-ambient-orb-bottom" />
-                <div className="bg-grid-pattern" />
 
                 {/* Middle Welcome & Core Content */}
                 <div className="hero-content">
