@@ -9,6 +9,7 @@ import {
     ExternalLink
 } from "lucide-react";
 import "./login.css";
+import { Link } from "react-router"
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -168,9 +169,11 @@ export default function Login() {
                     {/* Sign Up Redirect */}
                     <p className="signup-prompt">
                         Don't have an account?{" "}
-                        <button type="button" className="signup-link-btn">
-                            Register
-                        </button>
+                        <Link to="/signup">
+                            <button type="button" className="signup-link-btn">
+                                Register
+                            </button>
+                        </Link>
                     </p>
                 </div>
             </div>

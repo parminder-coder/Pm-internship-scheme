@@ -10,6 +10,7 @@ import {
     ExternalLink
 } from "lucide-react";
 import "./signup.css";
+import { Link } from "react-router"
 
 export default function Signup({ onNavigateToLogin }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -178,13 +179,15 @@ export default function Signup({ onNavigateToLogin }) {
                     {/* Sign In Redirect */}
                     <p className="signup-prompt">
                         Already have an account?{" "}
-                        <button
-                            type="button"
-                            className="signup-link-btn"
-                            onClick={onNavigateToLogin}
-                        >
-                            Sign In
-                        </button>
+                        <Link to="/">
+                            <button
+                                type="button"
+                                className="signup-link-btn"
+                                onClick={onNavigateToLogin}
+                            >
+                                Sign In
+                            </button>
+                        </Link>
                     </p>
                 </div>
             </div>
@@ -198,7 +201,7 @@ export default function Signup({ onNavigateToLogin }) {
                     </h2>
 
                     <p className="hero-description">
-                        Join the Prime Minister’s Internship Scheme today.<br/>  Gain real-world industry experience and professional mentorship.
+                        Join the Prime Minister’s Internship Scheme today.<br />  Gain real-world industry experience and professional mentorship.
                     </p>
                 </div>
 
