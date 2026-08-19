@@ -11,7 +11,7 @@ import {
 import "./login.css";
 import { Link } from "react-router"
 
-export default function Login() {
+export default function Login({ onNavigateToSignup }) {
     const [showPassword, setShowPassword] = useState(false);
     // const [rememberMe, setRememberMe] = useState(false);
 

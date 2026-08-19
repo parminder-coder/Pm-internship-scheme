@@ -6,8 +6,7 @@ import ProfileSetupForm from './pages/profileSetupForm'
 
 function App() {
   return (
-    <Login />
-    
+    <Login />    
   )
 }
 
