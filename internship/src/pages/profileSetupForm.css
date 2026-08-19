@@ -1,0 +1,984 @@
+/* ==========================================================================
+   PM Internship Scheme - Profile Setup Form Stylesheet (profileSetupForm.css)
+   ========================================================================== */
+
+.pis-page-wrapper {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    padding-bottom: 5rem;
+}
+
+/* ==========================================================================
+   TOP PORTAL NAVBAR
+   ========================================================================== */
+.pis-navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (min-width: 640px) {
+    .pis-navbar {
+        padding: 1.125rem 3rem;
+    }
+}
+
+.pis-navbar-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pis-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+}
+
+.pis-brand-badge {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #03045e 0%, #003459 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+    box-shadow: 0 4px 12px rgba(3, 4, 94, 0.2);
+    flex-shrink: 0;
+}
+
+.pis-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.pis-brand-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.pis-brand-sub {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+.pis-nav-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pis-pulse-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+/* ==========================================================================
+   CONTAINER & HERO BANNER
+   ========================================================================== */
+.pis-container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 2.25rem 1.5rem 0;
+}
+
+@media (min-width: 640px) {
+    .pis-container {
+        padding: 2.75rem 2rem 0;
+    }
+}
+
+.pis-hero-banner {
+    background: linear-gradient(135deg, #03045e 0%, #003459 100%);
+    border-radius: 1.25rem;
+    padding: 2.25rem 2rem;
+    color: #ffffff;
+    margin-bottom: 2.25rem;
+    box-shadow: 0 10px 25px -5px rgba(3, 4, 94, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.pis-hero-orb {
+    position: absolute;
+    top: -4rem;
+    right: -4rem;
+    width: 16rem;
+    height: 16rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(3, 4, 94, 0) 70%);
+    pointer-events: none;
+}
+
+.pis-eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #bfdbfe;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.875rem;
+}
+
+.pis-hero-title {
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin: 0 0 0.75rem;
+}
+
+@media (min-width: 640px) {
+    .pis-hero-title {
+        font-size: 2.25rem;
+    }
+}
+
+.pis-hero-desc {
+    font-size: 0.9375rem;
+    color: #dbeafe;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 44rem;
+}
+
+/* Guidelines Notice Alert */
+.pis-notice-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #03045e;
+    border-radius: 0.875rem;
+    padding: 1.125rem 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.pis-notice-icon {
+    color: #03045e;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.pis-notice-text {
+    font-size: 0.875rem;
+    color: #334155;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.pis-notice-text strong {
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   FORM SECTIONS & CARDS
+   ========================================================================== */
+.pis-form-section {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (min-width: 640px) {
+    .pis-form-section {
+        padding: 2.25rem 2.25rem;
+    }
+}
+
+.pis-form-section:focus-within {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.pis-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.pis-step-badge {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    background-color: #eff6ff;
+    color: #03045e;
+    border: 1px solid #bfdbfe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9375rem;
+    flex-shrink: 0;
+}
+
+.pis-section-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.pis-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.pis-section-subtitle {
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
+/* Form Grids */
+.pis-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .pis-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.pis-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .pis-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .pis-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.pis-span-full {
+    grid-column: 1 / -1;
+}
+
+/* Input Fields */
+.pis-field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.pis-field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.45rem;
+}
+
+.pis-req-star {
+    color: #ef4444;
+    margin-left: 0.2rem;
+}
+
+.pis-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pis-input-icon {
+    position: absolute;
+    left: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.pis-phone-prefix {
+    position: absolute;
+    left: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+    border-right: 1px solid #cbd5e1;
+    padding-right: 0.625rem;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.pis-input {
+    width: 100%;
+    height: 2.875rem;
+    padding: 0 1rem 0 2.625rem;
+    background-color: #ffffff;
+    font-size: 0.875rem;
+    color: #0f172a;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.75rem;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.pis-input-no-icon {
+    padding-left: 1rem;
+}
+
+.pis-input-phone {
+    padding-left: 4.25rem;
+}
+
+.pis-input::placeholder {
+    color: #94a3b8;
+}
+
+.pis-input:hover {
+    border-color: #cbd5e1;
+}
+
+.pis-input:focus {
+    border-color: #03045e;
+    box-shadow: 0 0 0 3.5px rgba(3, 4, 94, 0.1);
+}
+
+.pis-input-error {
+    border-color: #f87171 !important;
+    background-color: #fffafb;
+}
+
+.pis-input-error:focus {
+    box-shadow: 0 0 0 3.5px rgba(239, 68, 68, 0.1) !important;
+}
+
+.pis-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+.pis-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #ffffff;
+    font-size: 0.875rem;
+    color: #0f172a;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.75rem;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.pis-textarea:focus {
+    border-color: #03045e;
+    box-shadow: 0 0 0 3.5px rgba(3, 4, 94, 0.1);
+}
+
+.pis-err-msg {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #ef4444;
+    margin-top: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Special Affirmative Action Callout Card */
+.pis-affirmative-card {
+    background-color: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.pis-affirmative-card:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.pis-affirmative-card.selected {
+    background-color: #eff6ff;
+    border-color: #93c5fd;
+    box-shadow: 0 2px 8px rgba(3, 4, 94, 0.06);
+}
+
+.pis-checkbox-lg {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.375rem;
+    accent-color: #03045e;
+    margin-top: 0.125rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.pis-affirmative-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.pis-affirmative-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.pis-affirmative-sub {
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+    line-height: 1.45;
+}
+
+/* ==========================================================================
+   SKILLS DYNAMIC SECTION
+   ========================================================================== */
+.pis-skills-suggestion-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding: 0.875rem 1rem;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 0.875rem;
+}
+
+.pis-suggestion-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 0.25rem;
+}
+
+.pis-skill-chip-btn {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pis-skill-chip-btn:hover {
+    background-color: #03045e;
+    border-color: #03045e;
+    color: #ffffff;
+}
+
+.pis-skill-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+    align-items: flex-start;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.875rem;
+    padding: 1rem;
+    margin-bottom: 0.875rem;
+}
+
+@media (min-width: 640px) {
+    .pis-skill-row {
+        grid-template-columns: 2fr 1fr auto;
+        gap: 1rem;
+        align-items: center;
+    }
+}
+
+.pis-remove-skill-btn {
+    height: 2.875rem;
+    padding: 0 1rem;
+    border: 1px solid #fee2e2;
+    background-color: #ffffff;
+    color: #ef4444;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pis-remove-skill-btn:hover:not(:disabled) {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+
+.pis-remove-skill-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+}
+
+.pis-add-skill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #ffffff;
+    border: 1.5px dashed #03045e;
+    color: #03045e;
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.pis-add-skill-btn:hover {
+    background-color: #eff6ff;
+    border-style: solid;
+}
+
+/* ==========================================================================
+   MULTI-SELECT GRID (STATES & SECTORS)
+   ========================================================================== */
+.pis-selection-count-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    background-color: #eff6ff;
+    color: #03045e;
+    border: 1px solid #bfdbfe;
+}
+
+.pis-pill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.625rem;
+    margin-top: 0.5rem;
+}
+
+.pis-pill-card {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.65rem 0.875rem;
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #334155;
+    user-select: none;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pis-pill-card:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.pis-pill-card.selected {
+    border-color: #03045e;
+    background-color: #eff6ff;
+    color: #03045e;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(3, 4, 94, 0.08);
+}
+
+.pis-pill-card.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background-color: #f8fafc;
+}
+
+.pis-pill-card input[type="checkbox"] {
+    accent-color: #03045e;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* ==========================================================================
+   PAST PARTICIPATION RADIO CARDS
+   ========================================================================== */
+.pis-radio-cards-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .pis-radio-cards-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.pis-radio-card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1.125rem 1.25rem;
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pis-radio-card:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.pis-radio-card.selected {
+    border-color: #03045e;
+    background-color: #eff6ff;
+    box-shadow: 0 2px 8px rgba(3, 4, 94, 0.08);
+}
+
+.pis-radio-card input[type="radio"] {
+    accent-color: #03045e;
+    width: 1.125rem;
+    height: 1.125rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+.pis-radio-card-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   RESUME UPLOAD DROPZONE & PREVIEW
+   ========================================================================== */
+.pis-dropzone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 1rem;
+    padding: 2.25rem 1.5rem;
+    background-color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.pis-dropzone:hover {
+    border-color: #03045e;
+    background-color: #eff6ff;
+}
+
+.pis-dropzone.dragging {
+    border-color: #03045e;
+    background-color: #e0f2fe;
+    transform: scale(1.005);
+}
+
+.pis-dropzone-icon-badge {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #03045e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.pis-dropzone:hover .pis-dropzone-icon-badge {
+    transform: translateY(-2px);
+}
+
+.pis-dropzone-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.pis-dropzone-title span {
+    color: #03045e;
+    text-decoration: underline;
+}
+
+.pis-dropzone-sub {
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.pis-dropzone-format-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+}
+
+.pis-file-preview-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.125rem 1.25rem;
+    background-color: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 1rem;
+    transition: all 0.2s ease;
+}
+
+.pis-file-left {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    overflow: hidden;
+}
+
+.pis-file-icon-badge {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    background-color: #dcfce7;
+    border: 1px solid #86efac;
+    color: #15803d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pis-file-details {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pis-file-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 22rem;
+}
+
+.pis-file-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #166534;
+    margin-top: 0.125rem;
+}
+
+.pis-file-remove-btn {
+    height: 2.25rem;
+    padding: 0 0.875rem;
+    border: 1px solid #fecaca;
+    background-color: #ffffff;
+    color: #ef4444;
+    border-radius: 0.625rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.pis-file-remove-btn:hover {
+    background-color: #fee2e2;
+    border-color: #f87171;
+    color: #b91c1c;
+}
+
+/* ==========================================================================
+   STICKY ACTIONS BAR
+   ========================================================================== */
+.pis-actions-bar {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-top: 2rem;
+}
+
+@media (min-width: 640px) {
+    .pis-actions-bar {
+        flex-direction: row;
+    }
+}
+
+.pis-actions-info {
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+.pis-actions-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .pis-actions-btn-group {
+        width: auto;
+    }
+}
+
+.pis-save-btn {
+    height: 3rem;
+    padding: 0 2rem;
+    background: #03045e;
+    color: #ffffff;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 14px rgba(3, 4, 94, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+    flex: 1;
+}
+
+@media (min-width: 640px) {
+    .pis-save-btn {
+        flex: initial;
+    }
+}
+
+.pis-save-btn:hover:not(:disabled) {
+    background: #02033b;
+    box-shadow: 0 6px 20px rgba(3, 4, 94, 0.38);
+    transform: translateY(-1px);
+}
+
+.pis-save-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.pis-save-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.pis-success-toast {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
