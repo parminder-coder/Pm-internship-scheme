@@ -106,6 +106,15 @@ const internships = [
 function Dashboard({ onLogout, onProfile }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedInternship, setSelectedInternship] = useState(null);
+    const [userName] = useState(() => {
+        try {
+            const user = JSON.parse(localStorage.getItem("user"));
+            return user?.name || "Student";
+        } catch {
+            return "Student";
+        }
+    });
+    const userInitial = userName.charAt(0).toUpperCase();
 
     const menuRef = useRef(null);
 
@@ -188,11 +197,11 @@ function Dashboard({ onLogout, onProfile }) {
                             id="profile-menu-button"
                         >
                             <div className="avatar">
-                                P
+                                {userInitial}
                             </div>
 
                             <div className="profile-name">
-                                <strong>Parminder</strong>
+                                <strong>{userName}</strong>
                             </div>
 
                             <ChevronDown
@@ -205,9 +214,9 @@ function Dashboard({ onLogout, onProfile }) {
                         {isMenuOpen && (
                             <div className="profile-dropdown-menu" role="menu" aria-labelledby="profile-menu-button">
                                 <div className="menu-user-info">
-                                    <div className="avatar small">P</div>
+                                    <div className="avatar small">{userInitial}</div>
                                     <div className="menu-user-details">
-                                        <strong>Parminder</strong>
+                                        <strong>{userName}</strong>
                                     </div>
                                 </div>
 
@@ -245,7 +254,7 @@ function Dashboard({ onLogout, onProfile }) {
                         </div>
 
                         <h1>
-                            Welcome back, Parminder
+                            Welcome back, {userName}
                             <span> 👋</span>
                         </h1>
 

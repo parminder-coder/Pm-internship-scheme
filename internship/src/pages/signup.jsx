@@ -10,10 +10,12 @@ import {
     ExternalLink
 } from "lucide-react";
 import "./signup.css";
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
+import { registerUser } from "../api/auth";
 
 export default function Signup({ onNavigateToLogin }) {
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
     const {
         register,
@@ -30,10 +32,13 @@ export default function Signup({ onNavigateToLogin }) {
     });
 
     const onSubmit = async (data) => {
-        // API route to be integrated
-        console.log("Signup submitted:", data);
-        // Simulate brief network delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const result = await registerUser(data);
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user || {
+            name: data.name,
+            email: data.email,
+        }));
+        navigate("/dashboard");
     };
 
     return (
