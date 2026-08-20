@@ -560,19 +560,7 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
                                     {errors.skills?.[index]?.name && (
                                         <span className="pis-err-msg">• Skill name is required</span>
                                     )}
-                                </div>
-
-                                <div className="pis-field-group">
-                                    <select
-                                        {...register(`skills.${index}.proficiency`)}
-                                        defaultValue={field.proficiency || "Beginner"}
-                                        className="pis-input pis-input-no-icon pis-select"
-                                    >
-                                        <option value="Beginner">Beginner Level</option>
-                                        <option value="Intermediate">Intermediate Level</option>
-                                        <option value="Advanced">Advanced Level</option>
-                                    </select>
-                                </div>
+                                </div>                               
 
                                 <button
                                     type="button"
