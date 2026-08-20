@@ -38,7 +38,7 @@ export default function Signup({ onNavigateToLogin }) {
             name: data.name,
             email: data.email,
         }));
-        navigate("/dashboard");
+        navigate("/profileSetupForm");
     };
 
     return (

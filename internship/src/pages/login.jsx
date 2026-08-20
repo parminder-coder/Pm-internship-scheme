@@ -34,7 +34,7 @@ export default function Login({ onNavigateToSignup }) {
         const result = await loginUser(data);
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
-        navigate("/dashboard");
+        navigate("/profileSetupForm");
     };
 
     return (

@@ -10,6 +10,7 @@
 
 import React, { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useNavigate } from "react-router";
 import {
     User,
     Mail,
@@ -111,6 +112,8 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
     const [resumeError, setResumeError] = useState("");
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
+    const navigate = useNavigate();
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
     const {
         register,
@@ -122,8 +125,8 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
     } = useForm({
         mode: "onBlur",
         defaultValues: {
-            fullName: "",
-            email: "",
+            fullName: storedUser?.name || "",
+            email: storedUser?.email || "",
             phone: "",
             dob: "",
             gender: "",
@@ -221,10 +224,9 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
 
             if (onSubmit) {
                 await onSubmit(payload);
-            } else {
-                console.log("Applicant profile submitted:", payload);
             }
             setSaveSuccess(true);
+            navigate("/dashboard");
             window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (err) {
             console.error("Submission failed:", err);
