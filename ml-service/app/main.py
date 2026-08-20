@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.routes.recommendation import router as recommendation_router
+from app.routes.resume import router as resume_router
 
 
 app = FastAPI(
@@ -13,6 +14,10 @@ app.include_router(
     prefix="/api"
 )
 
+app.include_router(
+    resume_router,
+    prefix="/api"
+)
 
 @app.get("/")
 def root():
