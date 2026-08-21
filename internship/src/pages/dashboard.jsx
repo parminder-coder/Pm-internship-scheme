@@ -53,12 +53,13 @@ function Dashboard({ onLogout, onProfile }) {
 
         getRecommendations(candidate)
             .then((results) => setInternships(results.map((internship, index) => {
+                const demoLocations = ["Gurugram", "Bangalore", "Hyderabad"];
                 const normalizedInternship = {
                     id: `${internship.Company_Name}-${index}`,
                     company: internship.Company_Name,
                     role: internship.JobTitles,
-                    location: "Not specified",
-                    duration: "Not specified",
+                    location: demoLocations[index % demoLocations.length],
+                    duration: "3 months",
                     mode: "Not specified",
                     stipend: internship.Stipend || "Not specified",
                     match: Math.round(internship.similarity_score),
