@@ -3,7 +3,7 @@ import tempfile
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
-from app.services.parser import parse_resume
+from app.services.parser.parser import run_pipeline
 
 
 router = APIRouter()
@@ -40,13 +40,12 @@ async def parse_uploaded_resume(
             temp_path = temp_file.name
 
         try:
-            resume_data = parse_resume(temp_path)
+            resume_data = run_pipeline(uploaded_file_path=temp_path)
 
             return {
                 "success": True,
                 "filename": file.filename,
-                "candidate": resume_data,
-                "confidence": resume_data.get("confidence")
+                "candidate": resume_data
             }
 
         finally:

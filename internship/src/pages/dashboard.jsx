@@ -40,14 +40,15 @@ function Dashboard({ onLogout, onProfile }) {
         const storedProfile = JSON.parse(localStorage.getItem("candidateProfile") || "null");
         const parsedResume = storedProfile?.parsedResume;
         const profile = parsedResume || storedProfile || {};
+        const parsedFeatures = profile.ml_features || {};
         const candidate = {
-            skills: (profile.skills || []).map((skill) => typeof skill === "string" ? skill : skill.name).filter(Boolean),
-            education: profile.education || profile.qualification || "",
-            branch: profile.branch || profile.fieldOfStudy || "",
-            experience: profile.experience || "",
-            projects: profile.projects || [],
-            preferredJobRole: profile.preferredJobRole || "",
-            preferredDomain: profile.preferredDomain || profile.sectorInterests?.join(", ") || "",
+            skills: (profile.skills || parsedFeatures.skills || []).map((skill) => typeof skill === "string" ? skill : skill.name).filter(Boolean),
+            education: profile.education || parsedFeatures.education || profile.qualification || "",
+            branch: profile.branch || parsedFeatures.branch || profile.fieldOfStudy || "",
+            experience: profile.experience || parsedFeatures.experience || "",
+            projects: profile.projects || parsedFeatures.projects || [],
+            preferredJobRole: profile.preferredJobRole || parsedFeatures.preferredJobRole || "",
+            preferredDomain: profile.preferredDomain || parsedFeatures.preferredDomain || profile.sectorInterests?.join(", ") || "",
         };
 
         getRecommendations(candidate)
@@ -78,26 +79,30 @@ function Dashboard({ onLogout, onProfile }) {
     const menuRef = useRef(null);
 
     const buildRecommendationReason = (internship, candidate) => {
+        const splitSkills = (skills) => skills
+            .flatMap((skill) => String(skill).split(/[\/|&]/))
+            .map((skill) => skill.trim())
+            .filter(Boolean);
+
+        const normalizeSkill = (skill) => String(skill)
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+
         const internshipSkills = (internship.Skills || "")
             .split(",")
-            .map((skill) => skill.trim().toLowerCase())
-            .filter(Boolean);
+            .flatMap((skill) => splitSkills([skill]));
 
-        const candidateSkills = (candidate.skills || [])
-            .map((skill) => String(skill).trim().toLowerCase())
-            .filter(Boolean);
+        const candidateSkills = new Set(
+            splitSkills(candidate.skills || []).map(normalizeSkill)
+        );
 
-        const matchedSkills = internshipSkills.filter((skill) => candidateSkills.includes(skill));
+        const matchedSkills = internshipSkills.filter((skill) => candidateSkills.has(normalizeSkill(skill)));
 
         if (matchedSkills.length > 0) {
-            return `Why this internship is best suitable for you: your profile matches ${matchedSkills.slice(0, 3).join(", ")} and aligns strongly with this role.`;
+            return `You are eligible for this internship because your matched skills are ${matchedSkills.slice(0, 3).join(", ")}.`;
         }
 
-        if (candidate.education || candidate.branch) {
-            return `Why this internship is best suitable for you: your ${candidate.education || candidate.branch} background aligns well with the internship requirements.`;
-        }
-
-        return "Why this internship is best suitable for you: it matches your interest profile and skill development goals.";
+        return "You are eligible for this internship because it matches your interest profile and skill development goals.";
     };
 
     // Close menu when clicking outside

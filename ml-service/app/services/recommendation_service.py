@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -8,9 +10,8 @@ class RecommendationService:
 
     def __init__(self):
 
-        self.df = pd.read_csv(
-            "data/internships.csv"
-        )
+        dataset_path = Path(__file__).resolve().parents[2] / "data" / "internships.csv"
+        self.df = pd.read_csv(dataset_path)
 
         # Handle missing values
         for column in ["JobTitles", "Skills", "Description"]:

@@ -4,7 +4,7 @@ import tempfile
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from app.schemas.candidate import CandidateProfile
-from app.services.parser import parse_resume
+from app.services.parser.parser import run_pipeline
 from app.services.recommendation_service import RecommendationService
 
 
@@ -72,17 +72,18 @@ async def recommend_from_resume(
             temp_path = temp_file.name
 
         # Parse resume
-        resume_data = parse_resume(temp_path)
+        resume_data = run_pipeline(uploaded_file_path=temp_path)
+        candidate_features = resume_data["ml_features"]
 
         # Convert parsed data to CandidateProfile
         candidate = CandidateProfile(
-            skills=resume_data["skills"],
-            education=resume_data["education"],
-            branch=resume_data["branch"],
-            experience=resume_data["experience"],
-            projects=resume_data["projects"],
-            preferredJobRole=resume_data["preferredJobRole"],
-            preferredDomain=resume_data["preferredDomain"]
+            skills=candidate_features["skills"],
+            education=candidate_features["education"],
+            branch=candidate_features["branch"],
+            experience=candidate_features["experience"],
+            projects=candidate_features["projects"],
+            preferredJobRole=candidate_features["preferredJobRole"],
+            preferredDomain=candidate_features["preferredDomain"]
         )
 
         # Generate recommendations
