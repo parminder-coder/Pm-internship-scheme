@@ -10,6 +10,8 @@
 
 import React, { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { parseResume } from "../api/resume";
 import {
     User,
     Mail,
@@ -111,6 +113,8 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
     const [resumeError, setResumeError] = useState("");
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
+    const navigate = useNavigate();
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
     const {
         register,
@@ -122,8 +126,8 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
     } = useForm({
         mode: "onBlur",
         defaultValues: {
-            fullName: "",
-            email: "",
+            fullName: storedUser?.name || "",
+            email: storedUser?.email || "",
             phone: "",
             dob: "",
             gender: "",
@@ -161,12 +165,12 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
         setResumeError("");
         if (!file) return;
 
-        const allowedExtensions = [".pdf", ".doc", ".docx"];
+        const allowedExtensions = [".pdf", ".docx"];
         const fileExtension = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
         const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
 
         if (!allowedExtensions.includes(fileExtension)) {
-            setResumeError("Please upload a valid document format (.pdf, .doc, .docx)");
+            setResumeError("Please upload a valid document format (.pdf, .docx)");
             return;
         }
 
@@ -214,17 +218,25 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
 
     const submitHandler = async (data) => {
         try {
+            const parsedResume = resumeFile
+                ? await parseResume(resumeFile.rawFile)
+                : null;
+
             const payload = {
                 ...data,
                 resume: resumeFile ? { name: resumeFile.name, size: resumeFile.size } : null,
+                parsedResume: parsedResume?.candidate || null,
             };
+
+            if (parsedResume?.candidate) {
+                localStorage.setItem("parsedResume", JSON.stringify(parsedResume.candidate));
+            }
 
             if (onSubmit) {
                 await onSubmit(payload);
-            } else {
-                console.log("Applicant profile submitted:", payload);
             }
             setSaveSuccess(true);
+            navigate("/dashboard");
             window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (err) {
             console.error("Submission failed:", err);
@@ -745,7 +757,7 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
                                     type="file"
                                     ref={fileInputRef}
                                     onChange={handleFileChange}
-                                    accept=".pdf,.doc,.docx"
+                                    accept=".pdf,.docx"
                                     style={{ display: "none" }}
                                 />
                                 <div className="pis-dropzone-icon-badge">
@@ -755,7 +767,7 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
                                     <span>Click to browse</span> or drag and drop your resume here
                                 </p>
                                 <p className="pis-dropzone-sub">
-                                    Supported file formats: PDF, DOC, DOCX
+                                    Supported file formats: PDF, DOCX
                                 </p>
                                 <span className="pis-dropzone-format-pill">
                                     <FileCheck size={14} />

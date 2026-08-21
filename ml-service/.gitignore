@@ -1,5 +1,8 @@
 # Python
-.venv
+venv/
+.venv/
+__pycache__/
+*.pyc
 
 # Environment variables
 .env
@@ -8,6 +11,6 @@
 # Jupyter
 .ipynb_checkpoints/
 
-# Python model/cache files
-__pycache__/
-*.pyc
+# Local resumes / uploaded files
+*.pdf
+*.docx
