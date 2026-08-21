@@ -51,24 +51,54 @@ function Dashboard({ onLogout, onProfile }) {
         };
 
         getRecommendations(candidate)
-            .then((results) => setInternships(results.map((internship, index) => ({
-                id: `${internship.Company_Name}-${index}`,
-                company: internship.Company_Name,
-                role: internship.JobTitles,
-                location: "Not specified",
-                duration: "Not specified",
-                mode: "Not specified",
-                stipend: internship.Stipend || "Not specified",
-                match: Math.round(internship.similarity_score),
-                skills: internship.Skills.split(",").map((skill) => skill.trim()).filter(Boolean),
-                logo: internship.Company_Name?.charAt(0) || "I",
-                description: internship.Description,
-                eligibility: "See the internship listing for eligibility details.",
-            }))))
+            .then((results) => setInternships(results.map((internship, index) => {
+                const normalizedInternship = {
+                    id: `${internship.Company_Name}-${index}`,
+                    company: internship.Company_Name,
+                    role: internship.JobTitles,
+                    location: "Not specified",
+                    duration: "Not specified",
+                    mode: "Not specified",
+                    stipend: internship.Stipend || "Not specified",
+                    match: Math.round(internship.similarity_score),
+                    skills: internship.Skills.split(",").map((skill) => skill.trim()).filter(Boolean),
+                    logo: internship.Company_Name?.charAt(0) || "I",
+                    description: internship.Description,
+                    eligibility: "See the internship listing for eligibility details.",
+                };
+
+                return {
+                    ...normalizedInternship,
+                    reason: buildRecommendationReason(internship, candidate),
+                };
+            })))
             .catch((error) => setRecommendationError(error.message));
     }, []);
 
     const menuRef = useRef(null);
+
+    const buildRecommendationReason = (internship, candidate) => {
+        const internshipSkills = (internship.Skills || "")
+            .split(",")
+            .map((skill) => skill.trim().toLowerCase())
+            .filter(Boolean);
+
+        const candidateSkills = (candidate.skills || [])
+            .map((skill) => String(skill).trim().toLowerCase())
+            .filter(Boolean);
+
+        const matchedSkills = internshipSkills.filter((skill) => candidateSkills.includes(skill));
+
+        if (matchedSkills.length > 0) {
+            return `Why this internship is best suitable for you: your profile matches ${matchedSkills.slice(0, 3).join(", ")} and aligns strongly with this role.`;
+        }
+
+        if (candidate.education || candidate.branch) {
+            return `Why this internship is best suitable for you: your ${candidate.education || candidate.branch} background aligns well with the internship requirements.`;
+        }
+
+        return "Why this internship is best suitable for you: it matches your interest profile and skill development goals.";
+    };
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -346,7 +376,7 @@ function Dashboard({ onLogout, onProfile }) {
                                             <div style={{ width: `${internship.match}%` }} />
                                         </div>
 
-                                        <small>Strong match</small>
+                                        <small>{internship.reason}</small>
                                     </div>
 
                                     {/* ACTIONS */}
