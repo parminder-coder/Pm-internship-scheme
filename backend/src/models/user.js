@@ -20,8 +20,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-  
-   
+
+    isFormFilled: {
+      type: Boolean,
+      default: false,
+    },
   },
  
   {

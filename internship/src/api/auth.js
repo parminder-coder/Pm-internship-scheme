@@ -54,3 +54,52 @@ export async function verifyUserToken() {
 
     return result;
 }
+
+export async function completeUserProfile(token) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/complete-profile`, {
+        method: "POST",
+        headers,
+        credentials: "include"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to update profile status");
+    }
+
+    return result;
+}
+
+export async function saveStudentProfileForm(formData, token) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/student-profile`, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify(formData)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to save profile form to database");
+    }
+
+    return result;
+}

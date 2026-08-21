@@ -75,6 +75,14 @@ const userLoggedInSlice = createSlice({
             state.error = null;
 
             localStorage.removeItem("user");
+            localStorage.removeItem("candidateProfile");
+            localStorage.removeItem("parsedResume");
+        },
+        updateUserFormFilled: (state) => {
+            if (state.user) {
+                state.user.isFormFilled = true;
+                localStorage.setItem("user", JSON.stringify(state.user));
+            }
         }
     },
 
@@ -132,6 +140,6 @@ const userLoggedInSlice = createSlice({
     }
 });
 
-export const { setSession, logout } = userLoggedInSlice.actions;
+export const { logout, updateUserFormFilled } = userLoggedInSlice.actions;
 
 export default userLoggedInSlice.reducer;

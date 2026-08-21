@@ -62,7 +62,8 @@ async function registerUser(req, res) {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                isFormFilled: user.isFormFilled || false
             }
         });
 
@@ -133,7 +134,8 @@ async function loginUser(req, res) {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                isFormFilled: user.isFormFilled || false
             }
         });
 
@@ -161,7 +163,41 @@ async function checkAuth(req, res) {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                isFormFilled: user.isFormFilled || false
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+async function completeFormStatus(req, res) {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { isFormFilled: true },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile form completed successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                isFormFilled: user.isFormFilled
             }
         });
     } catch (err) {
@@ -184,5 +220,5 @@ module.exports = {
     registerUser,
     loginUser,
     checkAuth,
-    logoutUser
+    completeFormStatus
 };

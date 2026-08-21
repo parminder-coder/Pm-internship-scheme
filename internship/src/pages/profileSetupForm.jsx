@@ -11,7 +11,10 @@
 import { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
 import { parseResume } from "../api/resume";
+import { completeUserProfile, saveStudentProfileForm } from "../api/auth";
+import { updateUserFormFilled } from "../features/useLoggedInSlice";
 import {
     User,
     Mail,
@@ -113,6 +116,7 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
     const {
@@ -234,6 +238,50 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
             if (onSubmit) {
                 await onSubmit(payload);
             }
+
+            const backendPayload = {
+                personalInfo: {
+                    name: data.fullName || storedUser?.name || "Student",
+                    phone: data.phone || "0000000000",
+                    DOB: data.dob ? new Date(data.dob) : new Date("2000-01-01"),
+                    gender: (data.gender === "Female") ? "Female" : "Male"
+                },
+                education: {
+                    degree: data.qualification || "Degree",
+                    field: data.fieldOfStudy || "General",
+                    institution: data.institution || "Institution",
+                    GraduationYear: Number(data.yearOfPassing) || 2025,
+                    CGPA: Number(data.cgpaOrPercentage) || 0
+                },
+                location: {
+                    willingToRelocate: Boolean(data.willingToRelocate),
+                    preferredLocations: data.preferredStates || []
+                },
+                preferences: {
+                    sectors: data.sectorInterests || [],
+                    preferredRoles: []
+                },
+                resume: {
+                    fileUrl: data.portfolioUrl || "",
+                    parsed: {
+                        skills: (data.skills || []).map(s => typeof s === "string" ? s : s.name).filter(Boolean)
+                    }
+                }
+            };
+
+            try {
+                await saveStudentProfileForm(backendPayload);
+            } catch (err) {
+                console.warn("Backend form saving skipped/failed:", err);
+                try {
+                    await completeUserProfile();
+                } catch (statusErr) {
+                    console.warn("Backend form status update skipped/failed:", statusErr);
+                }
+            }
+
+            dispatch(updateUserFormFilled());
+
             setSaveSuccess(true);
             navigate("/dashboard");
             window.scrollTo({ top: 0, behavior: "smooth" });

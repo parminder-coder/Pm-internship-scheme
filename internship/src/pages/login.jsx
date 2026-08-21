@@ -42,7 +42,17 @@ export default function Login() {
         const resultAction = await dispatch(authenticateAndLogin(data));
 
         if (authenticateAndLogin.fulfilled.match(resultAction)) {
-            navigate("/dashboard");
+            const user = resultAction.payload?.user;
+            const isFormFilled = Boolean(user?.isFormFilled);
+
+            if (!isFormFilled) {
+                localStorage.removeItem("candidateProfile");
+                navigate("/profileSetupForm", {
+                    state: { notification: "Please complete your profile setup form to proceed." }
+                });
+            } else {
+                navigate("/dashboard");
+            }
         } else {
             console.error("Login API Error:", resultAction.payload);
             setApiError(resultAction.payload || "Invalid email or password");
