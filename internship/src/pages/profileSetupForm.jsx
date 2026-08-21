@@ -8,7 +8,7 @@
  * -----------------------------------------------------------------------
  */
 
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { parseResume } from "../api/resume";
@@ -27,8 +27,7 @@ import {
     Building2,
     UploadCloud,
     FileText,
-    FileCheck,
-    Link2
+    FileCheck
 } from "lucide-react";
 import "./profileSetupForm.css";
 
@@ -572,7 +571,7 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
                                     {errors.skills?.[index]?.name && (
                                         <span className="pis-err-msg">• Skill name is required</span>
                                     )}
-                                </div>                               
+                                </div>
 
                                 <button
                                     type="button"

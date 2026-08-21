@@ -15,6 +15,7 @@ import {
 import "./signup.css";
 import { Link, useNavigate } from "react-router";
 import { registerUser } from "../api/auth";
+import { setSession } from "../features/useLoggedInSlice";
 
 export default function Signup({ onNavigateToLogin }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -42,11 +43,10 @@ export default function Signup({ onNavigateToLogin }) {
         setNotification("");
         try {
             const result = await registerUser(data);
-            if (result.user) {
-                localStorage.setItem("user", JSON.stringify(result.user));
-            }
+            dispatch(setSession({ user: result.user }));
             navigate("/profileSetupForm");
         } catch (err) {
+            console.error("Signup API Error:", err);
             if (err.message && err.message.toLowerCase().includes("already exists")) {
                 const msg = "An account with this email already exists! Transferring to Sign In...";
                 setNotification(msg);
@@ -54,7 +54,7 @@ export default function Signup({ onNavigateToLogin }) {
                     navigate("/", { state: { notification: "An account with this email already exists. Please sign in with your password." } });
                 }, 1000);
             } else {
-                setApiError("Registration failed. Please try again.");
+                setApiError(err.message || "Registration failed. Please try again.");
             }
         }
     };

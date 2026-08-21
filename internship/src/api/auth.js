@@ -1,22 +1,28 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 async function sendAuthRequest(endpoint, data) {
-    const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(data),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(data),
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (!response.ok) {
-        throw new Error(result.message || "Authentication request failed");
+        if (!response.ok) {
+            console.error(`API Error on /auth/${endpoint} [${response.status}]:`, result);
+            throw new Error(result.message || `Request to /auth/${endpoint} failed with status ${response.status}`);
+        }
+
+        return result;
+    } catch (err) {
+        console.error(`Fetch Error on /auth/${endpoint}:`, err);
+        throw err;
     }
-
-    return result;
 }
 
 export function registerUser(data) {
@@ -27,18 +33,16 @@ export function loginUser(data) {
     return sendAuthRequest("login", data);
 }
 
-export async function verifyUserToken(token) {
-    const headers = {
-        "Content-Type": "application/json",
-    };
+export function logoutApiUser() {
+    return sendAuthRequest("logout", {});
+}
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
+export async function verifyUserToken() {
     const response = await fetch(`${API_BASE_URL}/auth/verify`, {
         method: "GET",
-        headers,
+        headers: {
+            "Content-Type": "application/json",
+        },
         credentials: "include"
     });
 

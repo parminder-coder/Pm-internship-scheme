@@ -15,7 +15,7 @@ import "./login.css";
 import { Link, useNavigate, useLocation } from "react-router";
 import { authenticateAndLogin } from "../features/useLoggedInSlice";
 
-export default function Login({ onNavigateToSignup }) {
+export default function Login() {
     const location = useLocation();
     const [showPassword, setShowPassword] = useState(false);
     const [apiError, setApiError] = useState("");
@@ -44,7 +44,8 @@ export default function Login({ onNavigateToSignup }) {
         if (authenticateAndLogin.fulfilled.match(resultAction)) {
             navigate("/dashboard");
         } else {
-            setApiError("Invalid email or password");
+            console.error("Login API Error:", resultAction.payload);
+            setApiError(resultAction.payload || "Invalid email or password");
         }
     };
 

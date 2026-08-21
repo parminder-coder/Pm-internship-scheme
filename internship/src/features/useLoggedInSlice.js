@@ -38,12 +38,18 @@ export const checkBackendAuth = createAsyncThunk(
     }
 );
 
-const savedUser = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+const savedUser = (() => {
+    try {
+        return localStorage.getItem("user")
+            ? JSON.parse(localStorage.getItem("user"))
+            : null;
+    } catch {
+        return null;
+    }
+})();
 
 const initialState = {
-    isLoggedIn: false,
+    isLoggedIn: !!savedUser,
     user: savedUser,
     loading: false,
     error: null
@@ -55,6 +61,14 @@ const userLoggedInSlice = createSlice({
     initialState,
 
     reducers: {
+        setSession: (state, action) => {
+            state.isLoggedIn = true;
+            state.user = action.payload.user || null;
+            state.error = null;
+            if (action.payload.user) {
+                localStorage.setItem("user", JSON.stringify(action.payload.user));
+            }
+        },
         logout: (state) => {
             state.isLoggedIn = false;
             state.user = null;
@@ -118,6 +132,6 @@ const userLoggedInSlice = createSlice({
     }
 });
 
-export const { logout } = userLoggedInSlice.actions;
+export const { setSession, logout } = userLoggedInSlice.actions;
 
 export default userLoggedInSlice.reducer;

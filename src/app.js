@@ -1,19 +1,22 @@
 const express = require('express');
+const cors = require("cors");
 const studentProfileRoutes = require("./routes/formroutes");
-const app = express(); 
+const authRoutes = require("./routes/authroutes");
+
+const app = express();
+
+app.use(cors({
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    credentials: true
+}));
+
 app.use(express.json());
 
-
-
-
-const cors = require("cors");
-const authRoutes = require("./routes/authroutes");
-app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api", studentProfileRoutes);
 
-app.get("/", (req,res)=>{
+app.get("/", (req, res) => {
     res.send("Backend Running");
-})
+});
 
 module.exports = app;

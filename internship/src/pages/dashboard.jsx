@@ -5,12 +5,10 @@ import {
     Clock3,
     ChevronDown,
     Sparkles,
-    CheckCircle2,
     BriefcaseBusiness,
     UserRound,
     LogOut,
     X,
-    ShieldCheck,
 } from "lucide-react";
 
 import "./dashboard.css";
@@ -103,7 +101,7 @@ const internships = [
     },
 ];
 
-function Dashboard({ onLogout, onProfile }) {
+function Dashboard() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedInternship, setSelectedInternship] = useState(null);
     const [userName] = useState(() => {
@@ -159,16 +157,16 @@ function Dashboard({ onLogout, onProfile }) {
     }, [selectedInternship]);
 
     const handleOpenProfile = () => {
-        setIsMenuOpen(false);        
+        setIsMenuOpen(false);
     };
 
     const handleLogoutClick = () => {
-        setIsMenuOpen(false);        
+        setIsMenuOpen(false);
     };
 
     return (
         <div className="dashboard">
-            
+
             {/* ================= HEADER ================= */}
             <header className="dashboard-header">
                 <div className="brand">
@@ -392,7 +390,7 @@ function Dashboard({ onLogout, onProfile }) {
                                         </button>
 
                                         <button
-                                            className="apply-button"                                            
+                                            className="apply-button"
                                         >
                                             Apply
                                         </button>
