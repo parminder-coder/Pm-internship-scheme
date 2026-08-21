@@ -15,7 +15,8 @@ const createProfile = async (req, res) => {
             personalInfo,
             education,
             location,
-            preferences
+            preferences,
+            resume
         } = req.body;
 
         if (!personalInfo || !education || !location || !preferences) {
@@ -31,7 +32,8 @@ const createProfile = async (req, res) => {
             personalInfo,
             education,
             location,
-            preferences
+            preferences,
+            resume
         });
 
         return res.status(201).json({
