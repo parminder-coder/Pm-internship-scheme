@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, verifyUserToken } from "../api/auth";
+import { loginUser, verifyUserToken, logoutApiUser } from "../api/auth";
 
 // Login user
 export const authenticateAndLogin = createAsyncThunk(
@@ -17,6 +17,20 @@ export const authenticateAndLogin = createAsyncThunk(
             return rejectWithValue(
                 err.message || "Authentication failed"
             );
+        }
+    }
+);
+
+// Perform Logout
+export const performLogout = createAsyncThunk(
+    "loggedIn/performLogout",
+    async (_, { dispatch }) => {
+        try {
+            await logoutApiUser();
+        } catch (err) {
+            console.warn("Logout API warning:", err);
+        } finally {
+            dispatch(logout());
         }
     }
 );
@@ -140,6 +154,6 @@ const userLoggedInSlice = createSlice({
     }
 });
 
-export const { logout, updateUserFormFilled } = userLoggedInSlice.actions;
+export const { setSession, logout, updateUserFormFilled } = userLoggedInSlice.actions;
 
 export default userLoggedInSlice.reducer;

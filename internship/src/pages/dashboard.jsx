@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
+import { performLogout } from "../features/useLoggedInSlice";
 import {
     Bell,
     MapPin,
@@ -102,6 +105,8 @@ const internships = [
 ];
 
 function Dashboard() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedInternship, setSelectedInternship] = useState(null);
     const [userName] = useState(() => {
@@ -158,10 +163,13 @@ function Dashboard() {
 
     const handleOpenProfile = () => {
         setIsMenuOpen(false);
+        navigate("/profileSetupForm");
     };
 
-    const handleLogoutClick = () => {
+    const handleLogoutClick = async () => {
         setIsMenuOpen(false);
+        await dispatch(performLogout());
+        navigate("/", { replace: true });
     };
 
     return (

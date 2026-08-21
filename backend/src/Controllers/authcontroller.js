@@ -220,5 +220,6 @@ module.exports = {
     registerUser,
     loginUser,
     checkAuth,
-    completeFormStatus
+    completeFormStatus,
+    logoutUser
 };
