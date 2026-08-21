@@ -12,100 +12,15 @@ import {
     X,
     ShieldCheck,
 } from "lucide-react";
+import { getRecommendations } from "../api/resume";
 
 import "./dashboard.css";
-
-// Dummy internship data with detailed specs
-const internships = [
-    {
-        id: 1,
-        company: "Tata Technologies",
-        role: "Software Developer Intern",
-        location: "New Delhi",
-        duration: "12 Months",
-        mode: "On-site",
-        stipend: "₹5,000 / month",
-        match: 94,
-        skills: ["React", "JavaScript", "Node.js", "MongoDB", "Git"],
-        logo: "T",
-        description: "Join the digital transformation unit at Tata Technologies under the PM Internship Scheme. As a Software Developer Intern, you will work on enterprise public digital infrastructure, scalable web applications, and modular UI components.",
-        eligibility: "Students/Graduates in B.Tech, BCA, or B.Sc (Computer Science / IT) with sound fundamentals in web development and data structures.",
-        responsibilities: [
-            "Develop, test, and maintain responsive front-end user interfaces using React.",
-            "Integrate RESTful backend services and collaborate with cross-functional engineering teams.",
-            "Write clean, maintainable, and well-documented code adhering to industry standards.",
-            "Participate in sprint planning, code reviews, and weekly mentorship sessions."
-        ],
-        perks: [
-            "Govt. DBT stipend allowance of ₹5,000/month",
-            "Official Certificate from Tata Technologies & Govt of India",
-            "Direct mentorship from senior technical leads",
-            "Pre-Placement Offer (PPO) consideration based on performance"
-        ],
-        vacancies: 15,
-        deadline: "28 Feb 2026",
-    },
-    {
-        id: 2,
-        company: "ABC Corporation",
-        role: "Data Analyst Intern",
-        location: "Chandigarh",
-        duration: "12 Months",
-        mode: "Hybrid",
-        stipend: "₹5,000 / month",
-        match: 89,
-        skills: ["Python", "SQL", "Data Analysis", "Tableau", "Power BI"],
-        logo: "A",
-        description: "Analyze large-scale operational datasets to extract actionable insights. Assist in developing automated dashboards and statistical reports for business operations and policy analytics.",
-        eligibility: "Undergraduates or recent graduates with proficiency in SQL, Python data libraries (Pandas/NumPy), and dashboard visualization tools.",
-        responsibilities: [
-            "Query and analyze multi-relational database structures using SQL.",
-            "Build dynamic visualization dashboards and performance reports using Power BI / Tableau.",
-            "Cleanse raw data streams and assist in automated ETL pipelines.",
-            "Present data findings and strategic trends to department heads."
-        ],
-        perks: [
-            "Govt. DBT stipend allowance of ₹5,000/month",
-            "Hands-on exposure to massive production data pipelines",
-            "Industry recognized PM Internship Scheme Certificate",
-            "Flexible hybrid work environment"
-        ],
-        vacancies: 8,
-        deadline: "05 Mar 2026",
-    },
-    {
-        id: 3,
-        company: "Tech Solutions India",
-        role: "AI / ML Intern",
-        location: "Bengaluru",
-        duration: "12 Months",
-        mode: "On-site",
-        stipend: "₹5,000 / month",
-        match: 86,
-        skills: ["Python", "Machine Learning", "TensorFlow", "NLP", "Pandas"],
-        logo: "T",
-        description: "Contribute to cutting-edge machine learning and natural language processing solutions. Work directly with applied research engineers on model fine-tuning, training datasets, and predictive modeling.",
-        eligibility: "Enrolled in or completed degree in Computer Science, Data Science, AI/ML, or Mathematics with strong Python programming fundamentals.",
-        responsibilities: [
-            "Assist in exploratory data analysis, dataset labeling, and feature engineering.",
-            "Train, evaluate, and benchmark deep learning & NLP baseline models.",
-            "Package and deploy model inference endpoints for web and mobile interfaces.",
-            "Document experimental benchmarks and optimize model inference latency."
-        ],
-        perks: [
-            "Govt. DBT stipend allowance of ₹5,000/month",
-            "Access to high-performance GPU compute clusters",
-            "Direct research mentorship from AI practitioners",
-            "Official Govt. PM Internship Scheme Certificate"
-        ],
-        vacancies: 10,
-        deadline: "12 Mar 2026",
-    },
-];
 
 function Dashboard({ onLogout, onProfile }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedInternship, setSelectedInternship] = useState(null);
+    const [internships, setInternships] = useState([]);
+    const [recommendationError, setRecommendationError] = useState("");
     const [userName] = useState(() => {
         try {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -115,6 +30,38 @@ function Dashboard({ onLogout, onProfile }) {
         }
     });
     const userInitial = userName.charAt(0).toUpperCase();
+
+    useEffect(() => {
+        const storedProfile = JSON.parse(localStorage.getItem("candidateProfile") || "null");
+        const parsedResume = storedProfile?.parsedResume;
+        const profile = parsedResume || storedProfile || {};
+        const candidate = {
+            skills: (profile.skills || []).map((skill) => typeof skill === "string" ? skill : skill.name).filter(Boolean),
+            education: profile.education || profile.qualification || "",
+            branch: profile.branch || profile.fieldOfStudy || "",
+            experience: profile.experience || "",
+            projects: profile.projects || [],
+            preferredJobRole: profile.preferredJobRole || "",
+            preferredDomain: profile.preferredDomain || profile.sectorInterests?.join(", ") || "",
+        };
+
+        getRecommendations(candidate)
+            .then((results) => setInternships(results.map((internship, index) => ({
+                id: `${internship.Company_Name}-${index}`,
+                company: internship.Company_Name,
+                role: internship.JobTitles,
+                location: "Not specified",
+                duration: "Not specified",
+                mode: "Not specified",
+                stipend: internship.Stipend || "Not specified",
+                match: Math.round(internship.similarity_score),
+                skills: internship.Skills.split(",").map((skill) => skill.trim()).filter(Boolean),
+                logo: internship.Company_Name?.charAt(0) || "I",
+                description: internship.Description,
+                eligibility: "See the internship listing for eligibility details.",
+            }))))
+            .catch((error) => setRecommendationError(error.message));
+    }, []);
 
     const menuRef = useRef(null);
 

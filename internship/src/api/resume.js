@@ -17,3 +17,27 @@ export async function parseResume(file) {
 
     return result;
 }
+
+export async function getRecommendations(candidate) {
+    let response;
+
+    try {
+        response = await fetch(`${ML_API_BASE_URL}/recommend`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(candidate),
+        });
+    } catch {
+        throw new Error("Cannot connect to the ML service. Make sure it is running on port 8000.");
+    }
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.detail || "Recommendations could not be loaded");
+    }
+
+    return result.recommendations;
+}

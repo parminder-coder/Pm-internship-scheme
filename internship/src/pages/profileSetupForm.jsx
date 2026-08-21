@@ -228,6 +228,8 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
                 parsedResume: parsedResume?.candidate || null,
             };
 
+            localStorage.setItem("candidateProfile", JSON.stringify(payload));
+
             if (parsedResume?.candidate) {
                 localStorage.setItem("parsedResume", JSON.stringify(parsedResume.candidate));
             }

@@ -44,7 +44,7 @@ export default function Login({ onNavigateToSignup }) {
         if (authenticateAndLogin.fulfilled.match(resultAction)) {
             navigate("/dashboard");
         } else {
-            setApiError("Invalid email or password");
+            setApiError(resultAction.payload || "Authentication failed");
         }
     };
 

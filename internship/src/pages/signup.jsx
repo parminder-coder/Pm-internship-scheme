@@ -54,7 +54,7 @@ export default function Signup({ onNavigateToLogin }) {
                     navigate("/", { state: { notification: "An account with this email already exists. Please sign in with your password." } });
                 }, 1000);
             } else {
-                setApiError("Registration failed. Please try again.");
+                setApiError(err.message || "Registration failed. Please try again.");
             }
         }
     };
