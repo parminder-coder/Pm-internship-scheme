@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
     User,
     Mail,
@@ -7,15 +8,20 @@ import {
     Eye,
     EyeOff,
     ArrowRight,
-    ExternalLink
+    ExternalLink,
+    Info,
+    AlertCircle
 } from "lucide-react";
 import "./signup.css";
-import { Link, useNavigate } from "react-router"
+import { Link, useNavigate } from "react-router";
 import { registerUser } from "../api/auth";
 
 export default function Signup({ onNavigateToLogin }) {
     const [showPassword, setShowPassword] = useState(false);
+    const [apiError, setApiError] = useState("");
+    const [notification, setNotification] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const {
         register,
@@ -32,13 +38,25 @@ export default function Signup({ onNavigateToLogin }) {
     });
 
     const onSubmit = async (data) => {
-        const result = await registerUser(data);
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("user", JSON.stringify(result.user || {
-            name: data.name,
-            email: data.email,
-        }));
-        navigate("/profileSetupForm");
+        setApiError("");
+        setNotification("");
+        try {
+            const result = await registerUser(data);
+            if (result.user) {
+                localStorage.setItem("user", JSON.stringify(result.user));
+            }
+            navigate("/profileSetupForm");
+        } catch (err) {
+            if (err.message && err.message.toLowerCase().includes("already exists")) {
+                const msg = "An account with this email already exists! Transferring to Sign In...";
+                setNotification(msg);
+                setTimeout(() => {
+                    navigate("/", { state: { notification: "An account with this email already exists. Please sign in with your password." } });
+                }, 1000);
+            } else {
+                setApiError("Registration failed. Please try again.");
+            }
+        }
     };
 
     return (
@@ -72,8 +90,25 @@ export default function Signup({ onNavigateToLogin }) {
                         </h1>
                     </div>
 
+                    {/* Notification & Error Alerts */}
+                    {notification && (
+                        <div style={{ color: "#1d4ed8", backgroundColor: "#eff6ff", padding: "12px 16px", borderRadius: "8px", marginBottom: "16px", fontSize: "14px", border: "1px solid #bfdbfe", display: "flex", alignItems: "center", gap: "10px", fontWeight: "500" }}>
+                            <Info size={18} color="#2563eb" style={{ flexShrink: 0 }} />
+                            <span>{notification}</span>
+                        </div>
+                    )}
+                    {apiError && (
+                        <div style={{ color: "#ef4444", backgroundColor: "#fef2f2", padding: "12px 16px", borderRadius: "8px", marginBottom: "16px", fontSize: "14px", border: "1px solid #fee2e2", display: "flex", alignItems: "center", gap: "10px" }}>
+                            <AlertCircle size={18} color="#dc2626" style={{ flexShrink: 0 }} />
+                            <span>{apiError}</span>
+                        </div>
+                    )}
+
                     {/* Form */}
                     <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
+
+
+
                         {/* Name Input */}
                         <div className="form-group">
                             <label className="form-label">

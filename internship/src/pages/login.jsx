@@ -1,21 +1,27 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
     Mail,
     Lock,
     Eye,
     EyeOff,
     ArrowRight,
-    ExternalLink
+    ExternalLink,
+    Info,
+    AlertCircle
 } from "lucide-react";
 import "./login.css";
-import { Link, useNavigate } from "react-router"
-import { loginUser } from "../api/auth";
+import { Link, useNavigate, useLocation } from "react-router";
+import { authenticateAndLogin } from "../features/useLoggedInSlice";
 
 export default function Login({ onNavigateToSignup }) {
+    const location = useLocation();
     const [showPassword, setShowPassword] = useState(false);
+    const [apiError, setApiError] = useState("");
+    const [infoNotification, setInfoNotification] = useState(location.state?.notification || location.state?.message || "");
     const navigate = useNavigate();
-    // const [rememberMe, setRememberMe] = useState(false);
+    const dispatch = useDispatch();
 
     const {
         register,
@@ -31,10 +37,15 @@ export default function Login({ onNavigateToSignup }) {
     });
 
     const onSubmit = async (data) => {
-        const result = await loginUser(data);
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("user", JSON.stringify(result.user));
-        navigate("/profileSetupForm");
+        setApiError("");
+        setInfoNotification("");
+        const resultAction = await dispatch(authenticateAndLogin(data));
+
+        if (authenticateAndLogin.fulfilled.match(resultAction)) {
+            navigate("/dashboard");
+        } else {
+            setApiError("Invalid email or password");
+        }
     };
 
     return (
@@ -68,8 +79,26 @@ export default function Login({ onNavigateToSignup }) {
                         </h1>
                     </div>
 
+                    {/* Notification & Error Alerts */}
+                    {infoNotification && (
+                        <div style={{ color: "#1d4ed8", backgroundColor: "#eff6ff", padding: "12px 16px", borderRadius: "8px", marginBottom: "16px", fontSize: "14px", border: "1px solid #bfdbfe", display: "flex", alignItems: "center", gap: "10px", fontWeight: "500" }}>
+                            <Info size={18} color="#2563eb" style={{ flexShrink: 0 }} />
+                            <span>{infoNotification}</span>
+                        </div>
+                    )}
+                    {apiError && (
+                        <div style={{ color: "#ef4444", backgroundColor: "#fef2f2", padding: "12px 16px", borderRadius: "8px", marginBottom: "16px", fontSize: "14px", border: "1px solid #fee2e2", display: "flex", alignItems: "center", gap: "10px" }}>
+                            <AlertCircle size={18} color="#dc2626" style={{ flexShrink: 0 }} />
+                            <span>{apiError}</span>
+                        </div>
+                    )}
+
                     {/* Form */}
                     <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+
+
+
+
                         {/* Email Input */}
                         <div className="form-group">
                             <label className="form-label">
@@ -141,21 +170,6 @@ export default function Login({ onNavigateToSignup }) {
                                 </p>
                             )}
                         </div>
-
-                        {/* Remember Me Checkbox */}
-                        {/* <div className="form-options-row">
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="checkbox-input"
-                                />
-                                <span className="checkbox-text">
-                                    Keep me logged in for 30 days
-                                </span>
-                            </label>
-                        </div> */}
 
                         {/* Submit Button */}
                         <button
