@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 import {
     Bell,
     MapPin,
@@ -13,6 +15,7 @@ import {
     ShieldCheck,
 } from "lucide-react";
 import { getRecommendations } from "../api/resume";
+import { logout } from "../features/useLoggedInSlice";
 
 import "./dashboard.css";
 
@@ -21,6 +24,8 @@ function Dashboard({ onLogout, onProfile }) {
     const [selectedInternship, setSelectedInternship] = useState(null);
     const [internships, setInternships] = useState([]);
     const [recommendationError, setRecommendationError] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [userName] = useState(() => {
         try {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -109,8 +114,24 @@ function Dashboard({ onLogout, onProfile }) {
         setIsMenuOpen(false);        
     };
 
-    const handleLogoutClick = () => {
-        setIsMenuOpen(false);        
+    const handleLogoutClick = async () => {
+        setIsMenuOpen(false);
+
+        try {
+            await fetch("http://localhost:3000/api/auth/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            });
+        } catch (error) {
+            console.error("Logout API failed:", error);
+        }
+
+        dispatch(logout());
+        if (onLogout) onLogout();
+        navigate("/");
     };
 
     return (

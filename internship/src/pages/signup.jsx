@@ -15,6 +15,7 @@ import {
 import "./signup.css";
 import { Link, useNavigate } from "react-router";
 import { registerUser } from "../api/auth";
+import { setAuthenticated } from "../features/useLoggedInSlice";
 
 export default function Signup({ onNavigateToLogin }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +45,7 @@ export default function Signup({ onNavigateToLogin }) {
             const result = await registerUser(data);
             if (result.user) {
                 localStorage.setItem("user", JSON.stringify(result.user));
+                dispatch(setAuthenticated(result.user));
             }
             navigate("/profileSetupForm");
         } catch (err) {

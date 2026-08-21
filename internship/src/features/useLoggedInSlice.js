@@ -55,12 +55,20 @@ const userLoggedInSlice = createSlice({
     initialState,
 
     reducers: {
+        setAuthenticated: (state, action) => {
+            state.isLoggedIn = true;
+            state.user = action.payload;
+            state.error = null;
+        },
         logout: (state) => {
             state.isLoggedIn = false;
             state.user = null;
             state.error = null;
 
             localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            localStorage.removeItem("candidateProfile");
+            localStorage.removeItem("parsedResume");
         }
     },
 
@@ -118,6 +126,6 @@ const userLoggedInSlice = createSlice({
     }
 });
 
-export const { logout } = userLoggedInSlice.actions;
+export const { setAuthenticated, logout } = userLoggedInSlice.actions;
 
 export default userLoggedInSlice.reducer;

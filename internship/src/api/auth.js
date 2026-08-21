@@ -22,6 +22,10 @@ async function sendAuthRequest(endpoint, data) {
         throw new Error(result.message || "Authentication request failed");
     }
 
+    if (result.token) {
+        localStorage.setItem("token", result.token);
+    }
+
     return result;
 }
 

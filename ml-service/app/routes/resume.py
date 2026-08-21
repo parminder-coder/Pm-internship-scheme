@@ -45,7 +45,8 @@ async def parse_uploaded_resume(
             return {
                 "success": True,
                 "filename": file.filename,
-                "candidate": resume_data
+                "candidate": resume_data,
+                "confidence": resume_data.get("confidence")
             }
 
         finally:

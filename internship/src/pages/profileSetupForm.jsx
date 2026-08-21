@@ -12,6 +12,7 @@ import React, { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { parseResume } from "../api/resume";
+import { saveStudentProfile } from "../api/profile";
 import {
     User,
     Mail,
@@ -221,6 +222,51 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
             const parsedResume = resumeFile
                 ? await parseResume(resumeFile.rawFile)
                 : null;
+
+            const numericCgpa = Number.parseFloat(
+                String(data.cgpaOrPercentage).replace(/[^0-9.]/g, "")
+            );
+
+            if (Number.isNaN(numericCgpa)) {
+                throw new Error("Please enter a valid CGPA or percentage score.");
+            }
+
+            const backendProfile = {
+                personalInfo: {
+                    name: data.fullName,
+                    phone: data.phone,
+                    DOB: data.dob,
+                    gender: data.gender === "female"
+                        ? "Female"
+                        : data.gender === "male"
+                            ? "Male"
+                            : undefined,
+                },
+                education: {
+                    degree: data.qualification,
+                    field: data.fieldOfStudy,
+                    institution: data.institution,
+                    GraduationYear: Number(data.yearOfPassing),
+                    CGPA: numericCgpa,
+                },
+                location: {
+                    willingToRelocate: Boolean(data.willingToRelocate),
+                    preferredLocations: data.preferredStates || [],
+                },
+                preferences: {
+                    sectors: data.sectorInterests || [],
+                    preferredRoles: [],
+                },
+                resume: parsedResume?.candidate
+                    ? {
+                        parsed: {
+                            skills: parsedResume.candidate.skills || [],
+                        },
+                    }
+                    : undefined,
+            };
+
+            await saveStudentProfile(backendProfile);
 
             const payload = {
                 ...data,
