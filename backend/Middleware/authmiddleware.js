@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-function auth (req, res, next) {
+function auth(req, res, next) {
     try {
         const authHeader = req.header("Authorization");
 
@@ -10,15 +10,15 @@ function auth (req, res, next) {
                 message: "Token Missing"
             });
         }
-        
-        const token = authHeader.startsWith("Bearer ") 
-            ? authHeader.slice(7) 
+
+        const token = authHeader.startsWith("Bearer ")
+            ? authHeader.slice(7)
             : authHeader;
-        
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         req.user = decoded;
-        next();       
+        next();
 
     } catch (err) {
         return res.status(401).json({

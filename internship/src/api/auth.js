@@ -6,6 +6,7 @@ async function sendAuthRequest(endpoint, data) {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(data),
     });
 
@@ -24,4 +25,28 @@ export function registerUser(data) {
 
 export function loginUser(data) {
     return sendAuthRequest("login", data);
+}
+
+export async function verifyUserToken(token) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+        method: "GET",
+        headers,
+        credentials: "include"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || "Token verification failed");
+    }
+
+    return result;
 }
