@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { performLogout } from "../features/useLoggedInSlice";
+import { getRecommendationsApi, uploadResumeApi } from "../api/auth";
 import {
     Bell,
     MapPin,
@@ -12,11 +13,12 @@ import {
     UserRound,
     LogOut,
     X,
+    UploadCloud,
 } from "lucide-react";
 
 import "./dashboard.css";
 
-// Dummy internship data with detailed specs
+// Fallback internship data
 const internships = [
     {
         id: 1,
@@ -109,6 +111,13 @@ function Dashboard() {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedInternship, setSelectedInternship] = useState(null);
+    const [recommendationsList, setRecommendationsList] = useState([]);
+    const [loadingRecs, setLoadingRecs] = useState(true);
+    const [hasResume, setHasResume] = useState(false);
+    const [uploadingResume, setUploadingResume] = useState(false);
+    const [uploadError, setUploadError] = useState("");
+    const dashboardFileInputRef = useRef(null);
+
     const [userName] = useState(() => {
         try {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -120,6 +129,138 @@ function Dashboard() {
     const userInitial = userName.charAt(0).toUpperCase();
 
     const menuRef = useRef(null);
+
+    // Fetch recommendations from backend ML model
+    useEffect(() => {
+        async function loadRecommendations() {
+            try {
+                setLoadingRecs(true);
+                const userStr = localStorage.getItem("user");
+                const userObj = userStr ? JSON.parse(userStr) : null;
+                const token = userObj?.token || "";
+
+                const res = await getRecommendationsApi(token);
+                if (res.success && res.hasResume !== false) {
+                    setHasResume(true);
+                    if (Array.isArray(res.recommendations) && res.recommendations.length > 0) {
+                        const formatted = res.recommendations.map((rec, index) => {
+                            const company = rec.Company_Name || "Company";
+                            const role = rec.JobTitles || "Internship Opportunity";
+                            const skillsRaw = rec.Skills || [];
+                            const skillsArray = Array.isArray(skillsRaw)
+                                ? skillsRaw
+                                : (typeof skillsRaw === "string" ? skillsRaw.split(",").map(s => s.trim()) : []);
+
+                            return {
+                                id: index + 1,
+                                company,
+                                role,
+                                location: rec.Location || "On-site",
+                                duration: rec.Duration || "12 Months",
+                                mode: rec.Mode || "Full-time",
+                                stipend: rec.Stipend || "₹5,000 / month",
+                                match: Math.round(rec.similarity_score || 85),
+                                skills: skillsArray.length > 0 ? skillsArray : ["Relevant Skills"],
+                                logo: company.charAt(0).toUpperCase(),
+                                description: rec.Description || "Opportunity under PM Internship Scheme.",
+                                eligibility: rec.Eligibility || "Students & Graduates eligible under PM Internship Scheme guidelines.",
+                                responsibilities: [
+                                    "Work directly on core deliverables and engineering modules.",
+                                    "Collaborate with cross-functional technical teams."
+                                ],
+                                perks: [
+                                    "Govt. DBT stipend allowance of ₹5,000/month",
+                                    "Official Certificate of Completion",
+                                    "Mentorship from industry professionals"
+                                ],
+                                link: rec.Links || "#"
+                            };
+                        });
+                        setRecommendationsList(formatted);
+                    } else {
+                        setRecommendationsList(internships);
+                    }
+                } else {
+                    setHasResume(false);
+                    setRecommendationsList([]);
+                }
+            } catch (err) {
+                console.warn("Could not load AI recommendations:", err);
+                setHasResume(false);
+                setRecommendationsList([]);
+            } finally {
+                setLoadingRecs(false);
+            }
+        }
+        loadRecommendations();
+    }, []);
+
+    // Direct inline upload from Dashboard
+    const handleDashboardUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith(".pdf")) {
+            setUploadError("Only PDF format resumes are allowed.");
+            return;
+        }
+
+        try {
+            setUploadError("");
+            setUploadingResume(true);
+            const userStr = localStorage.getItem("user");
+            const userObj = userStr ? JSON.parse(userStr) : null;
+            const token = userObj?.token || "";
+
+            const res = await uploadResumeApi(file, token);
+            if (res.success) {
+                setHasResume(true);
+                if (Array.isArray(res.recommendations) && res.recommendations.length > 0) {
+                    const formatted = res.recommendations.map((rec, index) => {
+                        const company = rec.Company_Name || "Company";
+                        const role = rec.JobTitles || "Internship Opportunity";
+                        const skillsRaw = rec.Skills || [];
+                        const skillsArray = Array.isArray(skillsRaw)
+                            ? skillsRaw
+                            : (typeof skillsRaw === "string" ? skillsRaw.split(",").map(s => s.trim()) : []);
+
+                        return {
+                            id: index + 1,
+                            company,
+                            role,
+                            location: rec.Location || "On-site",
+                            duration: rec.Duration || "12 Months",
+                            mode: rec.Mode || "Full-time",
+                            stipend: rec.Stipend || "₹5,000 / month",
+                            match: Math.round(rec.similarity_score || 85),
+                            skills: skillsArray.length > 0 ? skillsArray : ["Relevant Skills"],
+                            logo: company.charAt(0).toUpperCase(),
+                            description: rec.Description || "Opportunity under PM Internship Scheme.",
+                            eligibility: rec.Eligibility || "Students & Graduates eligible under PM Internship Scheme guidelines.",
+                            responsibilities: [
+                                "Work directly on core deliverables and engineering modules.",
+                                "Collaborate with cross-functional technical teams."
+                            ],
+                            perks: [
+                                "Govt. DBT stipend allowance of ₹5,000/month",
+                                "Official Certificate of Completion",
+                                "Mentorship from industry professionals"
+                            ],
+                            link: rec.Links || "#"
+                        };
+                    });
+                    setRecommendationsList(formatted);
+                } else {
+                    setRecommendationsList(internships);
+                }
+            }
+        } catch (err) {
+            console.error("Dashboard Resume Upload Error:", err);
+            setUploadError(err.message || "Failed to upload resume.");
+        } finally {
+            setUploadingResume(false);
+        }
+    };
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -299,7 +440,7 @@ function Dashboard() {
 
                         <div>
                             <span>AI Matches</span>
-                            <strong>{internships.length}</strong>
+                            <strong>{loadingRecs ? "..." : recommendationsList.length}</strong>
                         </div>
                     </div>
                 </section>
@@ -314,98 +455,145 @@ function Dashboard() {
                             </div>
 
                             <p>
-                                AI-powered matches based on your profile and preferences.
+                                AI-powered matches based on your profile and parsed resume.
                             </p>
                         </div>
                     </div>
 
                     {/* RECOMMENDATION LIST */}
                     <div className="recommendation-list">
-                        {internships.map((internship) => {
-                            return (
-                                <article className="internship-card" key={internship.id}>
-                                    {/* COMPANY */}
-                                    <div className="company-section">
-                                        <div className="company-logo">
-                                            {internship.logo}
-                                        </div>
+                        {loadingRecs ? (
+                            <div style={{ textAlign: "center", padding: "40px 0", color: "#64748b" }}>
+                                Loading AI recommendations...
+                            </div>
+                        ) : !hasResume ? (
+                            <div className="upload-resume-cta-card">
+                                <div className="cta-icon-wrap">
+                                    <UploadCloud size={32} />
+                                </div>
+                                <div className="cta-content">
+                                    <h3>Upload your Resume for AI Recommendations</h3>
+                                    <p>
+                                        Upload your latest resume (PDF) so our AI model can parse your skills and matching experience to recommend the top 5 internship opportunities under the PM Internship Scheme.
+                                    </p>
+                                    {uploadError && <p className="cta-error">• {uploadError}</p>}
+                                </div>
+                                <div className="cta-actions">
+                                    <input
+                                        type="file"
+                                        ref={dashboardFileInputRef}
+                                        style={{ display: "none" }}
+                                        accept=".pdf"
+                                        onChange={handleDashboardUpload}
+                                    />
+                                    <button
+                                        className="primary-button cta-upload-btn"
+                                        onClick={() => dashboardFileInputRef.current?.click()}
+                                        disabled={uploadingResume}
+                                    >
+                                        {uploadingResume ? (
+                                            <>Parsing & Uploading...</>
+                                        ) : (
+                                            <>
+                                                <UploadCloud size={17} />
+                                                Upload Resume (PDF)
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            recommendationsList.map((internship) => {
+                                return (
+                                    <article className="internship-card" key={internship.id}>
+                                        {/* COMPANY */}
+                                        <div className="company-section">
+                                            <div className="company-logo">
+                                                {internship.logo}
+                                            </div>
 
-                                        <div>
-                                            <span className="company-name">
-                                                {internship.company}
-                                            </span>
-
-                                            <h3>{internship.role}</h3>
-
-                                            <div className="job-details">
-                                                <span>
-                                                    <MapPin size={14} />
-                                                    {internship.location}
+                                            <div>
+                                                <span className="company-name">
+                                                    {internship.company}
                                                 </span>
 
-                                                <span>
-                                                    <Clock3 size={14} />
-                                                    {internship.duration}
-                                                </span>
+                                                <h3>{internship.role}</h3>
 
-                                                <span>
-                                                    {internship.mode}
-                                                </span>
+                                                <div className="job-details">
+                                                    <span>
+                                                        <MapPin size={14} />
+                                                        {internship.location}
+                                                    </span>
+
+                                                    <span>
+                                                        <Clock3 size={14} />
+                                                        {internship.duration}
+                                                    </span>
+
+                                                    <span>
+                                                        {internship.mode}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* SKILLS */}
-                                    <div className="skills-section">
-                                        <span className="skills-label">
-                                            Relevant skills
-                                        </span>
+                                        {/* SKILLS */}
+                                        <div className="skills-section">
+                                            <span className="skills-label">
+                                                Relevant skills
+                                            </span>
 
-                                        <div className="skills">
-                                            {internship.skills.slice(0, 3).map((skill) => (
-                                                <span key={skill}>{skill}</span>
-                                            ))}
-                                            {internship.skills.length > 3 && (
-                                                <span className="more-skill">
-                                                    +{internship.skills.length - 3}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* MATCH */}
-                                    <div className="match-section">
-                                        <div className="match-top">
-                                            <span>AI Match</span>
-                                            <strong>{internship.match}%</strong>
+                                            <div className="skills">
+                                                {internship.skills.slice(0, 3).map((skill) => (
+                                                    <span key={skill}>{skill}</span>
+                                                ))}
+                                                {internship.skills.length > 3 && (
+                                                    <span className="more-skill">
+                                                        +{internship.skills.length - 3}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <div className="match-bar">
-                                            <div style={{ width: `${internship.match}%` }} />
+                                        {/* MATCH */}
+                                        <div className="match-section">
+                                            <div className="match-top">
+                                                <span>AI Match</span>
+                                                <strong>{internship.match}%</strong>
+                                            </div>
+
+                                            <div className="match-bar">
+                                                <div style={{ width: `${internship.match}%` }} />
+                                            </div>
+
+                                            <small>Strong match</small>
                                         </div>
 
-                                        <small>Strong match</small>
-                                    </div>
+                                        {/* ACTIONS */}
+                                        <div className="card-actions">
+                                            <button
+                                                className="details-button"
+                                                onClick={() => setSelectedInternship(internship)}
+                                                id={`view-details-${internship.id}`}
+                                            >
+                                                View details
+                                            </button>
 
-                                    {/* ACTIONS */}
-                                    <div className="card-actions">
-                                        <button
-                                            className="details-button"
-                                            onClick={() => setSelectedInternship(internship)}
-                                            id={`view-details-${internship.id}`}
-                                        >
-                                            View details
-                                        </button>
-
-                                        <button
-                                            className="apply-button"
-                                        >
-                                            Apply
-                                        </button>
-                                    </div>
-                                </article>
-                            );
-                        })}
+                                            <button
+                                                className="apply-button"
+                                                onClick={() => {
+                                                    if (internship.link && internship.link !== "#") {
+                                                        window.open(internship.link, "_blank");
+                                                    }
+                                                }}
+                                            >
+                                                Apply
+                                            </button>
+                                        </div>
+                                    </article>
+                                );
+                            })
+                        )}
                     </div>
                 </section>
             </main>

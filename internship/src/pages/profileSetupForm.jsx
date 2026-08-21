@@ -13,7 +13,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { parseResume } from "../api/resume";
-import { completeUserProfile, saveStudentProfileForm } from "../api/auth";
+import { completeUserProfile, saveStudentProfileForm, uploadResumeApi } from "../api/auth";
 import { updateUserFormFilled } from "../features/useLoggedInSlice";
 import {
     User,
@@ -271,6 +271,14 @@ export default function ProfileSetupForm({ onSubmit, defaultValues }) {
 
             try {
                 await saveStudentProfileForm(backendPayload);
+                if (resumeFile?.rawFile) {
+                    try {
+                        const token = storedUser?.token || "";
+                        await uploadResumeApi(resumeFile.rawFile, token);
+                    } catch (resErr) {
+                        console.warn("Resume file upload in form submission failed:", resErr);
+                    }
+                }
             } catch (err) {
                 console.warn("Backend form saving skipped/failed:", err);
                 try {

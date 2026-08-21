@@ -11,7 +11,15 @@ async function sendAuthRequest(endpoint, data) {
             body: JSON.stringify(data),
         });
 
-        const result = await response.json();
+        const contentType = response.headers.get("content-type");
+        let result;
+        if (contentType && contentType.includes("application/json")) {
+            result = await response.json();
+        } else {
+            const text = await response.text();
+            console.error(`Non-JSON API error on /auth/${endpoint} [${response.status}]:`, text);
+            throw new Error(`Server error (${response.status}): ${response.statusText || "Request failed"}`);
+        }
 
         if (!response.ok) {
             console.error(`API Error on /auth/${endpoint} [${response.status}]:`, result);
@@ -95,10 +103,83 @@ export async function saveStudentProfileForm(formData, token) {
         body: JSON.stringify(formData)
     });
 
-    const result = await response.json();
+    const contentType = response.headers.get("content-type");
+    let result;
+    if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+    } else {
+        const text = await response.text();
+        console.error("Non-JSON API response from /student-profile:", response.status, text);
+        throw new Error(`Server error (${response.status}): ${response.statusText || "Unable to reach server"}`);
+    }
 
     if (!response.ok) {
         throw new Error(result.message || "Failed to save profile form to database");
+    }
+
+    return result;
+}
+
+export async function getRecommendationsApi(token) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/student-profile/recommendations`, {
+        method: "GET",
+        headers,
+        credentials: "include"
+    });
+
+    const contentType = response.headers.get("content-type");
+    let result;
+    if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+    } else {
+        const text = await response.text();
+        console.error("Non-JSON API response from /recommendations:", response.status, text);
+        throw new Error(`Server error (${response.status}): ${response.statusText || "Unable to reach server"}`);
+    }
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to fetch recommendations");
+    }
+
+    return result;
+}
+
+export async function uploadResumeApi(file, token) {
+    const headers = {};
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    const response = await fetch(`${API_BASE_URL}/student-profile/resume`, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: formData
+    });
+
+    const contentType = response.headers.get("content-type");
+    let result;
+    if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+    } else {
+        const text = await response.text();
+        console.error("Non-JSON API response from /resume:", response.status, text);
+        throw new Error(`Server error (${response.status}): ${response.statusText || "Unable to process resume"}`);
+    }
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to upload resume");
     }
 
     return result;

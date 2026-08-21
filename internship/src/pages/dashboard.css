@@ -792,6 +792,75 @@
 
 /* Match */
 
+/* =========================================================
+   UPLOAD RESUME CTA BANNER
+========================================================= */
+
+.upload-resume-cta-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 30px 34px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+    margin-top: 10px;
+    transition: border-color 0.2s;
+}
+
+.upload-resume-cta-card:hover {
+    border-color: #3b82f6;
+}
+
+.cta-icon-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cta-content {
+    flex: 1;
+}
+
+.cta-content h3 {
+    margin: 0 0 6px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.cta-content p {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.cta-error {
+    margin-top: 8px !important;
+    color: #ef4444 !important;
+    font-weight: 500;
+    font-size: 12px !important;
+}
+
+.cta-actions {
+    flex-shrink: 0;
+}
+
+.cta-upload-btn {
+    height: 44px;
+    padding: 0 20px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
 .match-section {
     min-width: 120px;
 }
