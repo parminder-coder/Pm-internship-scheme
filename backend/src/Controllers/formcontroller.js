@@ -254,7 +254,10 @@ const uploadResume = async (req, res) => {
                         email: cand.email || "",
                         phone: cand.phone || "",
                         preferredJobRole: cand.preferredJobRole || "",
-                        preferredDomain: cand.preferredDomain || ""
+                        preferredDomain: cand.preferredDomain || "",
+                        matchExplanation: cand.matchExplanation || "You are eligible for this internship because it matches your interest profile and skill development goals.",
+                        warnings: cand.warnings || [],
+                        bluffWords: cand.bluffWords || []
                     };
                 }
             } else {
@@ -350,23 +353,37 @@ const getRecommendations = async (req, res) => {
             preferredDomain: profile.preferences?.sectors?.[0] || ""
         };
 
-        const mlServiceUrl = process.env.ML_SERVICE_URL || "http://127.0.0.1:8000";
-        const recResponse = await fetch(`${mlServiceUrl}/api/recommend`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(candidatePayload)
-        });
+        let recommendations = [];
+        const storedExplanation = profile.resume?.parsed?.matchExplanation || "You are eligible for this internship because it matches your interest profile and skill development goals.";
 
-        if (!recResponse.ok) {
-            throw new Error(`ML Recommendation Service returned status ${recResponse.status}`);
+        try {
+            const mlServiceUrl = process.env.ML_SERVICE_URL || "http://127.0.0.1:8000";
+            const recResponse = await fetch(`${mlServiceUrl}/api/recommend`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(candidatePayload)
+            });
+
+            if (recResponse.ok) {
+                const recData = await recResponse.json();
+                const rawRecs = recData.recommendations || [];
+                recommendations = rawRecs.map((rec) => ({
+                    ...rec,
+                    matchExplanation: rec.matchExplanation || storedExplanation
+                }));
+            } else {
+                console.warn(`ML Service returned status ${recResponse.status}`);
+            }
+        } catch (mlErr) {
+            console.error("Failed to connect to ML Recommendation Service:", mlErr.message);
         }
-
-        const recData = await recResponse.json();
 
         return res.status(200).json({
             success: true,
             hasResume: true,
-            recommendations: recData.recommendations || []
+            warnings: profile.resume?.parsed?.warnings || [],
+            bluffWords: profile.resume?.parsed?.bluffWords || [],
+            recommendations
         });
 
     } catch (error) {

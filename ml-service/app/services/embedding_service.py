@@ -1,10 +1,14 @@
-# FastAPI starts
-#      ↓
-# EmbeddingService()
-#      ↓
-# Download/load MiniLM
-#      ↓
-# Keep model in memory
+import os
+import logging
+import warnings
+
+# Suppress Hugging Face Hub unauthenticated rate-limit warnings
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+warnings.filterwarnings("ignore")
+
 from sentence_transformers import SentenceTransformer
 
 

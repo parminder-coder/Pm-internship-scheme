@@ -111,6 +111,18 @@ const formSchema = new mongoose.Schema({
                 preferredDomain:{
                     type: String,
                     default: ""
+                },
+                matchExplanation:{
+                    type: String,
+                    default: "You are eligible for this internship because it matches your interest profile and skill development goals."
+                },
+                warnings:{
+                    type: [String],
+                    default: []
+                },
+                bluffWords:{
+                    type: [String],
+                    default: []
                 }
             }
         },

@@ -87,6 +87,38 @@ export async function completeUserProfile(token) {
     return result;
 }
 
+export async function getStudentProfileApi(token) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/student-profile`, {
+        method: "GET",
+        headers,
+        credentials: "include"
+    });
+
+    const contentType = response.headers.get("content-type");
+    let result;
+    if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+    } else {
+        const text = await response.text();
+        console.error("Non-JSON API response from GET /student-profile:", response.status, text);
+        throw new Error(`Server error (${response.status}): ${response.statusText || "Unable to reach server"}`);
+    }
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to fetch student profile");
+    }
+
+    return result;
+}
+
 export async function saveStudentProfileForm(formData, token) {
     const headers = {
         "Content-Type": "application/json",

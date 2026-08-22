@@ -29,7 +29,9 @@ def recommend(candidate: CandidateProfile):
                 "Description",
                 "Stipend",
                 "Links",
-                "similarity_score"
+                "similarity_score",
+                "matchExplanation",
+                "suggestedImprovements"
             ]
         ].to_dict(orient="records")
     }
@@ -98,7 +100,9 @@ async def recommend_from_resume(
                 "Description",
                 "Stipend",
                 "Links",
-                "similarity_score"
+                "similarity_score",
+                "matchExplanation",
+                "suggestedImprovements"
             ]
         ].to_dict(orient="records")
 

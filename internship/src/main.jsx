@@ -7,6 +7,7 @@ import Login from './pages/login'
 import Signup from './pages/signup'
 import ProfileSetupForm from './pages/profileSetupForm'
 import Dashboard from './pages/dashboard'
+import ViewProfile from './pages/viewProfile'
 import ProtectedRoute from './protectedRoutes/ProtectedRoute'
 import { BrowserRouter, Routes, Route } from "react-router"
 
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')).render(
           <Route element={<ProtectedRoute />}>
             <Route path="/profileSetupForm" element={<ProfileSetupForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/viewProfile" element={<ViewProfile />} />
           </Route>
         </Routes>
       </BrowserRouter>

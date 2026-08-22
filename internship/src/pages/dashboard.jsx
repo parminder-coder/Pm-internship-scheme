@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { performLogout } from "../features/useLoggedInSlice";
@@ -14,12 +14,19 @@ import {
     LogOut,
     X,
     UploadCloud,
+    Search,
+    Filter,
+    CheckCircle,
+    SlidersHorizontal,
+    TrendingUp,
+    FileCheck,
+    AlertTriangle
 } from "lucide-react";
 
 import "./dashboard.css";
 
 // Fallback internship data
-const internships = [
+const fallbackInternships = [
     {
         id: 1,
         company: "Tata Technologies",
@@ -47,6 +54,7 @@ const internships = [
         ],
         vacancies: 15,
         deadline: "28 Feb 2026",
+        matchExplanation: "You are eligible for this internship because it matches your interest profile and skill development goals.",
     },
     {
         id: 2,
@@ -82,7 +90,7 @@ const internships = [
         role: "AI / ML Intern",
         location: "Bengaluru",
         duration: "12 Months",
-        mode: "On-site",
+        mode: "Remote",
         stipend: "₹5,000 / month",
         match: 86,
         skills: ["Python", "Machine Learning", "TensorFlow", "NLP", "Pandas"],
@@ -116,7 +124,20 @@ function Dashboard() {
     const [hasResume, setHasResume] = useState(false);
     const [uploadingResume, setUploadingResume] = useState(false);
     const [uploadError, setUploadError] = useState("");
+    const [toastMessage, setToastMessage] = useState("");
+    const [appliedIds, setAppliedIds] = useState(new Set());
+
+    const [resumeWarnings, setResumeWarnings] = useState([]);
+
+    const [resumeBluffWords, setResumeBluffWords] = useState([]);
+
+    // Search and filter states
+    const [searchQuery, setSearchQuery] = useState("");
+    const [minMatchFilter, setMinMatchFilter] = useState(0);
+    const [workModeFilter, setWorkModeFilter] = useState("ALL");
+
     const dashboardFileInputRef = useRef(null);
+    const menuRef = useRef(null);
 
     const [userName] = useState(() => {
         try {
@@ -128,7 +149,13 @@ function Dashboard() {
     });
     const userInitial = userName.charAt(0).toUpperCase();
 
-    const menuRef = useRef(null);
+    // Auto dismiss toast message
+    useEffect(() => {
+        if (toastMessage) {
+            const timer = setTimeout(() => setToastMessage(""), 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [toastMessage]);
 
     // Fetch recommendations from backend ML model
     useEffect(() => {
@@ -142,6 +169,8 @@ function Dashboard() {
                 const res = await getRecommendationsApi(token);
                 if (res.success && res.hasResume !== false) {
                     setHasResume(true);
+                    setResumeWarnings(Array.isArray(res.warnings) ? res.warnings : []);
+                    setResumeBluffWords(Array.isArray(res.bluffWords) ? res.bluffWords : []);
                     if (Array.isArray(res.recommendations) && res.recommendations.length > 0) {
                         const formatted = res.recommendations.map((rec, index) => {
                             const company = rec.Company_Name || "Company";
@@ -151,13 +180,23 @@ function Dashboard() {
                                 ? skillsRaw
                                 : (typeof skillsRaw === "string" ? skillsRaw.split(",").map(s => s.trim()) : []);
 
+                            const rawModeStr = ((rec.Mode || rec.mode || rec.Work_Mode || rec.Location || "").toString()).toLowerCase();
+                            let computedMode = "On-site";
+                            if (rawModeStr.includes("remote") || rawModeStr.includes("home") || rawModeStr.includes("online")) {
+                                computedMode = "Remote";
+                            } else if (rawModeStr.includes("hybrid")) {
+                                computedMode = "Hybrid";
+                            } else {
+                                computedMode = "On-site";
+                            }
+
                             return {
                                 id: index + 1,
                                 company,
                                 role,
                                 location: rec.Location || "On-site",
                                 duration: rec.Duration || "12 Months",
-                                mode: rec.Mode || "Full-time",
+                                mode: computedMode,
                                 stipend: rec.Stipend || "₹5,000 / month",
                                 match: Math.round(rec.similarity_score || 85),
                                 skills: skillsArray.length > 0 ? skillsArray : ["Relevant Skills"],
@@ -173,12 +212,14 @@ function Dashboard() {
                                     "Official Certificate of Completion",
                                     "Mentorship from industry professionals"
                                 ],
-                                link: rec.Links || "#"
+                                link: rec.Links || "#",
+                                matchExplanation: rec.matchExplanation || res.parsed?.matchExplanation || "You are eligible for this internship because it matches your interest profile and skill development goals.",
+                                suggestedImprovements: rec.suggestedImprovements || "Highlight relevant project experience to boost candidate match score for this role."
                             };
                         });
                         setRecommendationsList(formatted);
                     } else {
-                        setRecommendationsList(internships);
+                        setRecommendationsList(fallbackInternships);
                     }
                 } else {
                     setHasResume(false);
@@ -215,6 +256,9 @@ function Dashboard() {
             const res = await uploadResumeApi(file, token);
             if (res.success) {
                 setHasResume(true);
+                setToastMessage("Resume uploaded and parsed successfully!");
+                setResumeWarnings(Array.isArray(res.warnings) ? res.warnings : []);
+                setResumeBluffWords(Array.isArray(res.bluffWords) ? res.bluffWords : []);
                 if (Array.isArray(res.recommendations) && res.recommendations.length > 0) {
                     const formatted = res.recommendations.map((rec, index) => {
                         const company = rec.Company_Name || "Company";
@@ -224,13 +268,23 @@ function Dashboard() {
                             ? skillsRaw
                             : (typeof skillsRaw === "string" ? skillsRaw.split(",").map(s => s.trim()) : []);
 
+                        const rawModeStr = ((rec.Mode || rec.mode || rec.Work_Mode || rec.Location || "").toString()).toLowerCase();
+                        let computedMode = "On-site";
+                        if (rawModeStr.includes("remote") || rawModeStr.includes("home") || rawModeStr.includes("online")) {
+                            computedMode = "Remote";
+                        } else if (rawModeStr.includes("hybrid")) {
+                            computedMode = "Hybrid";
+                        } else {
+                            computedMode = "On-site";
+                        }
+
                         return {
                             id: index + 1,
                             company,
                             role,
                             location: rec.Location || "On-site",
                             duration: rec.Duration || "12 Months",
-                            mode: rec.Mode || "Full-time",
+                            mode: computedMode,
                             stipend: rec.Stipend || "₹5,000 / month",
                             match: Math.round(rec.similarity_score || 85),
                             skills: skillsArray.length > 0 ? skillsArray : ["Relevant Skills"],
@@ -246,12 +300,14 @@ function Dashboard() {
                                 "Official Certificate of Completion",
                                 "Mentorship from industry professionals"
                             ],
-                            link: rec.Links || "#"
+                            link: rec.Links || "#",
+                            matchExplanation: rec.matchExplanation || res.parsed?.matchExplanation || "You are eligible for this internship because it matches your interest profile and skill development goals.",
+                            suggestedImprovements: rec.suggestedImprovements || "Highlight relevant project experience to boost candidate match score for this role."
                         };
                     });
                     setRecommendationsList(formatted);
                 } else {
-                    setRecommendationsList(internships);
+                    setRecommendationsList(fallbackInternships);
                 }
             }
         } catch (err) {
@@ -304,7 +360,7 @@ function Dashboard() {
 
     const handleOpenProfile = () => {
         setIsMenuOpen(false);
-        navigate("/profileSetupForm");
+        navigate("/viewProfile");
     };
 
     const handleLogoutClick = async () => {
@@ -313,8 +369,50 @@ function Dashboard() {
         navigate("/", { replace: true });
     };
 
+    const handleApply = (internship) => {
+        setAppliedIds((prev) => new Set([...prev, internship.id]));
+        setToastMessage(`Application submitted for ${internship.role} at ${internship.company}!`);
+
+        if (internship.link && internship.link !== "#") {
+            window.open(internship.link, "_blank");
+        }
+    };
+
+    // Filtered list evaluation
+    const filteredInternships = useMemo(() => {
+        return recommendationsList.filter((item) => {
+            const matchesQuery =
+                !searchQuery.trim() ||
+                item.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+
+            const matchesScore = item.match >= minMatchFilter;
+
+            const matchesMode =
+                workModeFilter === "ALL" ||
+                item.mode.toLowerCase().replace(/[^a-z]/g, "") === workModeFilter.toLowerCase().replace(/[^a-z]/g, "") ||
+                item.mode.toLowerCase().includes(workModeFilter.toLowerCase()) ||
+                item.location.toLowerCase().includes(workModeFilter.toLowerCase());
+
+            return matchesQuery && matchesScore && matchesMode;
+        });
+    }, [recommendationsList, searchQuery, minMatchFilter, workModeFilter]);
+
+    const highMatchCount = useMemo(() => {
+        return recommendationsList.filter((item) => item.match >= 80).length;
+    }, [recommendationsList]);
+
     return (
         <div className="dashboard">
+
+            {/* Toast feedback notification */}
+            {toastMessage && (
+                <div className="dashboard-toast">
+                    <CheckCircle size={18} />
+                    <span>{toastMessage}</span>
+                </div>
+            )}
 
             {/* ================= HEADER ================= */}
             <header className="dashboard-header">
@@ -423,6 +521,7 @@ function Dashboard() {
 
                             <button
                                 className="secondary-button"
+                                onClick={handleOpenProfile}
                             >
                                 <UserRound size={17} />
                                 View Profile
@@ -439,8 +538,19 @@ function Dashboard() {
                         </div>
 
                         <div>
-                            <span>AI Matches</span>
+                            <span>Best Matches</span>
                             <strong>{loadingRecs ? "..." : recommendationsList.length}</strong>
+                        </div>
+                    </div>
+
+                    <div className="stat-item">
+                        <div className={`stat-icon ${hasResume ? "purple" : "amber"}`}>
+                            <FileCheck size={19} />
+                        </div>
+
+                        <div>
+                            <span>Resume Status</span>
+                            <strong>{hasResume ? "Verified & Parsed" : "Not Uploaded"}</strong>
                         </div>
                     </div>
                 </section>
@@ -460,11 +570,76 @@ function Dashboard() {
                         </div>
                     </div>
 
+                    {/* AUDIT / DISCREPANCY WARNING BANNER */}
+                    {hasResume && resumeWarnings.length > 0 && (
+                        <div className="resume-warning-banner">
+                            <div className="warning-banner-header">
+                                <AlertTriangle size={18} className="warning-icon" />
+                                <strong>Resume Audit Alert: {resumeWarnings.length} Discrepancies / Mismatches Detected</strong>
+                            </div>
+                            <ul className="warning-list">
+                                {resumeWarnings.map((warn, i) => (
+                                    <li key={i}>{warn}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* FILTER TOOLBAR */}
+                    {hasResume && recommendationsList.length > 0 && (
+                        <div className="filter-toolbar">
+                            <div className="search-box">
+                                <Search size={17} className="search-icon" />
+                                <input
+                                    type="text"
+                                    placeholder="Search by role, company, or skill..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                {searchQuery && (
+                                    <button className="clear-search" onClick={() => setSearchQuery("")}>
+                                        <X size={15} />
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="filter-group">
+                                <div className="filter-select-wrapper">
+                                    <SlidersHorizontal size={15} className="select-icon" />
+                                    <select
+                                        value={minMatchFilter}
+                                        onChange={(e) => setMinMatchFilter(Number(e.target.value))}
+                                    >
+                                        <option value={0}>All Match Scores</option>
+                                        <option value={70}>70%+ Match</option>
+                                        <option value={80}>80%+ Match</option>
+                                        <option value={90}>90%+ Match</option>
+                                    </select>
+                                </div>
+
+                                <div className="filter-select-wrapper">
+                                    <Filter size={15} className="select-icon" />
+                                    <select
+                                        value={workModeFilter}
+                                        onChange={(e) => setWorkModeFilter(e.target.value)}
+                                    >
+                                        <option value="ALL">All Work Modes</option>
+                                        <option value="On-site">On-site</option>
+                                        <option value="Hybrid">Hybrid</option>
+                                        <option value="Remote">Remote</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* RECOMMENDATION LIST */}
                     <div className="recommendation-list">
                         {loadingRecs ? (
-                            <div style={{ textAlign: "center", padding: "40px 0", color: "#64748b" }}>
-                                Loading AI recommendations...
+                            <div className="loading-skeleton-container">
+                                <div className="skeleton-card" />
+                                <div className="skeleton-card" />
+                                <div className="skeleton-card" />
                             </div>
                         ) : !hasResume ? (
                             <div className="upload-resume-cta-card">
@@ -502,8 +677,25 @@ function Dashboard() {
                                     </button>
                                 </div>
                             </div>
+                        ) : filteredInternships.length === 0 ? (
+                            <div className="empty-results-card">
+                                <Search size={36} />
+                                <h3>No matching internships found</h3>
+                                <p>Try adjusting your search query or filters to discover available opportunities.</p>
+                                <button
+                                    className="secondary-button"
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setMinMatchFilter(0);
+                                        setWorkModeFilter("ALL");
+                                    }}
+                                >
+                                    Reset Filters
+                                </button>
+                            </div>
                         ) : (
-                            recommendationsList.map((internship) => {
+                            filteredInternships.map((internship) => {
+                                const isApplied = appliedIds.has(internship.id);
                                 return (
                                     <article className="internship-card" key={internship.id}>
                                         {/* COMPANY */}
@@ -566,7 +758,9 @@ function Dashboard() {
                                                 <div style={{ width: `${internship.match}%` }} />
                                             </div>
 
-                                            <small>Strong match</small>
+                                            <p className="match-explanation">
+                                                {internship.matchExplanation || "You are eligible for this internship because it matches your interest profile and skill development goals."}
+                                            </p>
                                         </div>
 
                                         {/* ACTIONS */}
@@ -580,14 +774,18 @@ function Dashboard() {
                                             </button>
 
                                             <button
-                                                className="apply-button"
-                                                onClick={() => {
-                                                    if (internship.link && internship.link !== "#") {
-                                                        window.open(internship.link, "_blank");
-                                                    }
-                                                }}
+                                                className={`apply-button ${isApplied ? "applied" : ""}`}
+                                                onClick={() => handleApply(internship)}
+                                                disabled={isApplied}
                                             >
-                                                Apply
+                                                {isApplied ? (
+                                                    <>
+                                                        <CheckCircle size={15} />
+                                                        Applied
+                                                    </>
+                                                ) : (
+                                                    "Apply"
+                                                )}
                                             </button>
                                         </div>
                                     </article>
@@ -620,6 +818,7 @@ function Dashboard() {
                                 </div>
                                 <div>
                                     <h2 className="modal-title">{selectedInternship.role}</h2>
+                                    <span className="company-name modal-company">{selectedInternship.company}</span>
                                 </div>
                             </div>
                             <button
@@ -645,7 +844,7 @@ function Dashboard() {
                                 <div className="highlight-box">
                                     <span className="highlight-label">Location & Mode</span>
                                     <strong className="highlight-value">
-                                        {selectedInternship.location} • {selectedInternship.mode}
+                                        {selectedInternship.location} &bull; {selectedInternship.mode}
                                     </strong>
                                 </div>
 
@@ -676,6 +875,30 @@ function Dashboard() {
                                 <p className="modal-text">{selectedInternship.eligibility}</p>
                             </div>
 
+                            {/* RESPONSIBILITIES */}
+                            {selectedInternship.responsibilities && selectedInternship.responsibilities.length > 0 && (
+                                <div className="modal-section">
+                                    <h4 className="modal-section-heading">Key Responsibilities</h4>
+                                    <ul className="modal-list">
+                                        {selectedInternship.responsibilities.map((resp, idx) => (
+                                            <li key={idx}>{resp}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* PERKS */}
+                            {selectedInternship.perks && selectedInternship.perks.length > 0 && (
+                                <div className="modal-section">
+                                    <h4 className="modal-section-heading">Perks & Benefits</h4>
+                                    <ul className="modal-list">
+                                        {selectedInternship.perks.map((perk, idx) => (
+                                            <li key={idx}>{perk}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
                             {/* REQUIRED SKILLS */}
                             <div className="modal-section">
                                 <h4 className="modal-section-heading">Required & Relevant Skills</h4>
@@ -687,6 +910,37 @@ function Dashboard() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* AI RESUME IMPROVEMENT ADVICE */}
+                            {selectedInternship.suggestedImprovements && (
+                                <div className="modal-section modal-improvement-box">
+                                    <h4 className="modal-section-heading flex-heading text-emerald">
+                                        <Sparkles size={16} className="sparkle-icon" />
+                                        How to Improve Your Resume for This Role
+                                    </h4>
+                                    <p className="modal-text highlight-text">{selectedInternship.suggestedImprovements}</p>
+                                </div>
+                            )}
+
+                            {/* DETECTED RESUME WARNINGS & BLUFF KEYWORDS */}
+                            {(resumeBluffWords.length > 0 || resumeWarnings.length > 0) && (
+                                <div className="modal-section modal-bluff-box">
+                                    <h4 className="modal-section-heading flex-heading text-amber">
+                                        <AlertTriangle size={16} className="warning-icon" />
+                                        Detected Resume Audit Alerts & Bluff Keywords
+                                    </h4>
+                                    <ul className="modal-list warning-list-modal">
+                                        {resumeBluffWords.map((word, idx) => (
+                                            <li key={`b-${idx}`}>
+                                                Unusual / exaggerated keyword: <strong>"{word}"</strong>
+                                            </li>
+                                        ))}
+                                        {resumeWarnings.map((warn, idx) => (
+                                            <li key={`w-${idx}`}>{warn}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                         </div>
 
                         {/* MODAL FOOTER */}
@@ -699,10 +953,12 @@ function Dashboard() {
                             </button>
 
                             <button
-                                className="modal-primary-btn"
+                                className={`modal-primary-btn ${appliedIds.has(selectedInternship.id) ? "applied" : ""}`}
+                                onClick={() => handleApply(selectedInternship)}
+                                disabled={appliedIds.has(selectedInternship.id)}
                             >
                                 <BriefcaseBusiness size={17} />
-                                Apply for Internship
+                                {appliedIds.has(selectedInternship.id) ? "Applied" : "Apply for Internship"}
                             </button>
                         </div>
                     </div>
