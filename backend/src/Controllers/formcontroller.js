@@ -33,7 +33,8 @@ const createProfile = async (req, res) => {
             personalInfo,
             education,
             location,
-            preferences
+            preferences,
+            resume: req.body.resume || {}
         });
 
         return res.status(201).json({
@@ -225,9 +226,13 @@ const uploadResume = async (req, res) => {
 
         // Forward file to ML service parser
         try {
+            const fileObj = new File(
+                [req.file.buffer],
+                req.file.originalname || "resume.pdf",
+                { type: req.file.mimetype || "application/pdf" }
+            );
             const formData = new FormData();
-            const blob = new Blob([req.file.buffer], { type: req.file.mimetype || "application/pdf" });
-            formData.append("file", blob, req.file.originalname || "resume.pdf");
+            formData.append("file", fileObj);
 
             const mlServiceUrl = process.env.ML_SERVICE_URL || "http://127.0.0.1:8000";
             const parseResponse = await fetch(`${mlServiceUrl}/api/parse-resume`, {
@@ -244,14 +249,19 @@ const uploadResume = async (req, res) => {
                         education: cand.education || "",
                         branch: cand.branch || "",
                         experience: cand.experience || "",
-                        projects: cand.projects || []
+                        projects: cand.projects || [],
+                        name: cand.name || "",
+                        email: cand.email || "",
+                        phone: cand.phone || "",
+                        preferredJobRole: cand.preferredJobRole || "",
+                        preferredDomain: cand.preferredDomain || ""
                     };
                 }
             } else {
                 console.error("ML Parser Service returned status:", parseResponse.status);
             }
         } catch (parseErr) {
-            console.error("Failed to parse resume with ML service:", parseErr.message);
+            console.error("Failed to parse resume with ML service:", parseErr.cause ? (parseErr.cause.message || parseErr.cause) : parseErr.message);
         }
 
         await profile.save();
@@ -281,7 +291,7 @@ const uploadResume = async (req, res) => {
                 recommendations = recData.recommendations || [];
             }
         } catch (recErr) {
-            console.error("Failed to fetch recommendations from ML model:", recErr.message);
+            console.error("Failed to fetch recommendations from ML model:", recErr.cause ? (recErr.cause.message || recErr.cause) : recErr.message);
         }
 
         return res.status(200).json({

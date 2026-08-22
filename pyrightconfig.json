@@ -1,0 +1,8 @@
+{
+  "venvPath": "ml-service",
+  "venv": "venv",
+  "extraPaths": [
+    "ml-service",
+    "ml-service/venv/lib/python3.12/site-packages"
+  ]
+}

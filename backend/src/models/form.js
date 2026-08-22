@@ -75,6 +75,42 @@ const formSchema = new mongoose.Schema({
                 skills:{
                     type : [String],
                     default : []
+                },
+                education:{
+                    type: String,
+                    default: ""
+                },
+                branch:{
+                    type: String,
+                    default: ""
+                },
+                experience:{
+                    type: String,
+                    default: ""
+                },
+                projects:{
+                    type: [String],
+                    default: []
+                },
+                name:{
+                    type: String,
+                    default: ""
+                },
+                email:{
+                    type: String,
+                    default: ""
+                },
+                phone:{
+                    type: String,
+                    default: ""
+                },
+                preferredJobRole:{
+                    type: String,
+                    default: ""
+                },
+                preferredDomain:{
+                    type: String,
+                    default: ""
                 }
             }
         },
